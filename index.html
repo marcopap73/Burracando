@@ -40,9 +40,9 @@
     --error-c: #ffdad6;
     --on-error-c: #410002;
     --surface: #f6fbf3;
-    --surface-low: #f0f5ed;
-    --surface-c: #eaefe7;
-    --surface-high: #e4eae2;
+    --surface-low: #ffffff;
+    --surface-c: #f7faf6;
+    --surface-high: #f4f7f2;
     --surface-highest: #dfe4dc;
     --on-surface: #171d18;
     --on-surface-var: #414941;
@@ -57,19 +57,6 @@
     --font: "Roboto Flex", Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
     --ease: cubic-bezier(.2, 0, 0, 1);
     color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --felt: #0a3b26; --felt-alto: #0f4e33; --felt-basso: #052215; --nav: #04190f;
-      --primary: #7edb9b; --on-primary: #00391c; --primary-c: #00522b; --on-primary-c: #9af5b5;
-      --secondary-c: #374b3c; --on-secondary-c: #d2e8d4;
-      --tertiary: #efc06c; --tertiary-c: #5d4200; --on-tertiary-c: #ffdea6;
-      --error: #ffb4ab; --error-c: #93000a; --on-error-c: #ffdad6;
-      --surface: #0f1511; --surface-low: #171d19; --surface-c: #1b211d; --surface-high: #252b27; --surface-highest: #303631;
-      --on-surface: #dee4dd; --on-surface-var: #c0c9bf; --outline: #8a9389; --outline-var: #414941;
-      --inverse-surface: #dee4dd; --inverse-on: #2c322d; --inverse-primary: #006d3b;
-      color-scheme: dark;
-    }
   }
 
   * { box-sizing: border-box; }
@@ -279,6 +266,7 @@
   .switch.malus:checked { background: var(--error); border-color: var(--error); }
   .switch.malus:checked::before { background: var(--surface-low); }
   .switch:focus-visible { outline-offset: 3px; }
+  .switch:disabled { opacity: .38; cursor: not-allowed; }
 
   /* Regole */
   .lista-valori { list-style: none; margin: 0; padding: 0; }
@@ -776,9 +764,10 @@ function vistaManche(id, n) {
       </div>`)}
     </div>`;
 
-  const interruttore = (campo, titolo, sotto, malus) => `<div class="voce">
+  const interruttore = (campo, titolo, sotto, malus, nota = '') => `<div class="voce">
       <div class="voce-titolo"><strong>${titolo}</strong><span>${sotto}</span></div>
-      ${colonne((i, d) => `<div class="cella-switch"><input type="checkbox" role="switch" class="switch${malus ? ' malus' : ''}" data-campo="${campo}" data-i="${i}" ${d[campo] ? 'checked' : ''} aria-label="${titolo}: ${chi(i)}"></div>`)}
+      ${colonne((i, d) => `<div class="cella-switch"><input type="checkbox" role="switch" class="switch${malus ? ' malus' : ''}" data-campo="${campo}" data-i="${i}" ${d[campo] ? 'checked' : ''} ${campo === 'pozzetto' && d.chiusura ? 'disabled' : ''} aria-label="${titolo}: ${chi(i)}"></div>`)}
+      ${nota}
     </div>`;
 
   const corpo = manuale
@@ -801,7 +790,7 @@ function vistaManche(id, n) {
       <section class="card">
         <h2>Fine mano</h2>
         ${interruttore('chiusura', 'Ha chiuso', `+${PUNTI.chiusura}`, false)}
-        ${interruttore('pozzetto', 'Pozzetto non preso', `−${PUNTI.pozzetto}`, true)}
+        ${interruttore('pozzetto', 'Pozzetto non preso', `−${PUNTI.pozzetto}`, true, '<p class="supporto" style="margin:8px 0 0">Chi ha chiuso ha preso per forza il pozzetto.</p>')}
         <div class="voce">${colonne((i, d) => `<p class="riepilogo num" id="r-${i}">${riepilogo(d, semi)}</p>`)}</div>
       </section>`;
 
@@ -870,6 +859,7 @@ function salvaManche() {
   const p = trovaPartita(calc.id);
   const chiusi = calc.dettagli.filter(d => !d.manuale && d.chiusura).length;
   if (chiusi > 1) { $('#errore-manche').textContent = 'Può chiudere un solo giocatore o una sola coppia per manche.'; return; }
+  calc.dettagli.forEach(d => { if (d.chiusura) d.pozzetto = false; });
   const punti = calc.dettagli.map(d => puntiDettaglio(d, p.regolamento));
   const manche = { punti, dettagli: calc.dettagli.map(d => JSON.parse(JSON.stringify(d))) };
   const eraFinita = p.finita;
@@ -969,7 +959,7 @@ function vistaRegole() {
         ${voce('Pozzetto non preso', 'Chi a fine mano non ha raccolto il pozzetto.', `−${PUNTI.pozzetto}`, 'malus-txt')}
         ${voce('Carte rimaste in mano', 'Si sottrae il valore di ogni carta.', '− valore', 'malus-txt')}
       </ul>
-      <p class="var piccolo" style="margin-top:8px">Per chiudere bisogna aver preso il pozzetto e avere almeno un burraco a terra.</p>
+      <p class="var piccolo" style="margin-top:8px">Per chiudere bisogna aver preso il pozzetto e avere almeno un burraco a terra. Quindi chi chiude non può mai avere la penalità del pozzetto non preso.</p>
     </section>
 
     <section class="card">
@@ -1134,16 +1124,25 @@ document.addEventListener('change', e => {
   const i = intero(el.dataset.i);
   const campo = el.dataset.campo;
   calc.dettagli[i][campo] = el.checked;
-  // può chiudere una sola squadra: tolgo la chiusura agli altri
-  if (campo === 'chiusura' && el.checked) {
-    calc.dettagli.forEach((d, j) => {
-      if (j !== i && d.chiusura) {
-        d.chiusura = false;
-        const altro = document.querySelector(`input[data-campo="chiusura"][data-i="${j}"]`);
-        if (altro) altro.checked = false;
-        aggiornaTotaleManche(j);
-      }
-    });
+  const pozzetto = j => document.querySelector(`input[data-campo="pozzetto"][data-i="${j}"]`);
+  if (campo === 'chiusura') {
+    // chi chiude ha per forza preso il pozzetto: spengo e blocco "pozzetto non preso"
+    if (el.checked) calc.dettagli[i].pozzetto = false;
+    const pz = pozzetto(i);
+    if (pz) { pz.checked = calc.dettagli[i].pozzetto; pz.disabled = el.checked; }
+    // può chiudere una sola squadra: tolgo la chiusura agli altri
+    if (el.checked) {
+      calc.dettagli.forEach((d, j) => {
+        if (j !== i && d.chiusura) {
+          d.chiusura = false;
+          const altro = document.querySelector(`input[data-campo="chiusura"][data-i="${j}"]`);
+          if (altro) altro.checked = false;
+          const pzAltro = pozzetto(j);
+          if (pzAltro) pzAltro.disabled = false;
+          aggiornaTotaleManche(j);
+        }
+      });
+    }
   }
   aggiornaTotaleManche(i);
 });
