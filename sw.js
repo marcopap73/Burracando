@@ -2,11 +2,13 @@
    Strategia: risponde subito con la copia salvata e intanto scarica la versione nuova,
    così dopo ogni pubblicazione su GitHub l'app si aggiorna da sola alla riapertura successiva.
    Se cambi l'elenco dei file, aumenta il numero di VERSIONE. */
-const VERSIONE = 'burracando-v3';
+const VERSIONE = 'burracando-v4';
 const FILE_APP = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './regolamento-italiano.md',
+  './regolamento-internazionale.md',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',

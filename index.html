@@ -192,6 +192,9 @@
   .seg button svg { width: 18px; height: 18px; }
   .seg button[aria-pressed="true"] { background: var(--secondary-c); color: var(--on-secondary-c); }
   .seg button span { overflow-wrap: anywhere; }
+  .seg.verticale { flex-direction: column; border-radius: 16px; }
+  .seg.verticale button { justify-content: flex-start; padding: 4px 16px; min-height: 52px; font-size: .9375rem; }
+  .seg.verticale button + button { border-left: 0; border-top: 1px solid var(--outline); }
 
   /* Chip filtro */
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -312,6 +315,36 @@
   .snackbar button { color: var(--inverse-primary); background: transparent; border: 0; min-height: 44px; padding: 0 12px; border-radius: 999px; font-weight: 600; }
   body.senza-nav .snackbar { bottom: calc(88px + env(safe-area-inset-bottom)); }
 
+  .campo-num:disabled { opacity: .38; cursor: not-allowed; }
+
+  /* Regole: fonti e collegamenti */
+  .fonte { display: inline-block; margin-top: 10px; font-size: .75rem; font-weight: 600; color: var(--on-surface-var); background: var(--surface-high); border-radius: 6px; padding: 2px 8px; }
+  .chiedi-link { display: flex; align-items: center; gap: 16px; text-decoration: none; color: var(--on-surface); }
+  .chiedi-link svg { width: 32px; height: 32px; color: var(--primary); }
+  .lista-numerata { margin: 0; padding-left: 22px; }
+  .lista-numerata li { margin-bottom: 10px; }
+  .avviso-card { background: var(--oro-c); color: var(--on-oro-c); }
+  .passi { margin: 12px 0; padding-left: 22px; }
+  .passi li { margin-bottom: 6px; }
+  .passi a { color: var(--primary); font-weight: 600; }
+
+  /* Chat */
+  .chat-lista { display: flex; flex-direction: column; gap: 10px; }
+  .fumetto { max-width: 88%; padding: 12px 16px; border-radius: 20px; box-shadow: var(--elev-1); overflow-wrap: anywhere; }
+  .fumetto p + p, .fumetto ul + p, .fumetto p + ul { margin-top: 8px; }
+  .fumetto ul { margin: 0; padding-left: 20px; }
+  .fumetto.utente { align-self: flex-end; background: var(--primary-c); color: var(--on-primary-c); border-bottom-right-radius: 6px; }
+  .fumetto.assistente { align-self: flex-start; background: var(--surface-low); color: var(--on-surface); border-bottom-left-radius: 6px; }
+  .fumetto.errore { align-self: stretch; max-width: none; background: var(--error-c); color: var(--on-error-c); font-weight: 600; }
+  .sto-pensando { color: var(--on-surface-var); font-style: italic; }
+  .chat-input { pointer-events: auto; flex: 1; display: flex; align-items: flex-end; gap: 8px; background: var(--surface-low); border-radius: 28px; padding: 6px 6px 6px 18px; box-shadow: var(--elev-3); }
+  .chat-input textarea { flex: 1; border: 0; background: transparent; resize: none; font: inherit; font-size: 1rem; color: var(--on-surface); padding: 10px 0; max-height: 140px; line-height: 1.4; }
+  .chat-input textarea:focus { outline: none; }
+  .chat-input:focus-within { outline: 3px solid var(--inverse-primary); outline-offset: 2px; }
+  .chat-input .invia { background: var(--primary); color: var(--on-primary); }
+  .chat-input .invia:disabled { opacity: .38; }
+  body.con-chat .app { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
   }
@@ -329,6 +362,7 @@
     <li><a href="#/partite" data-nav="partite"><span class="ind"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/></svg></span>Partite</a></li>
     <li><a href="#/nuova" data-nav="nuova"><span class="ind"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></span>Nuova</a></li>
     <li><a href="#/regole" data-nav="regole"><span class="ind"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></span>Regole</a></li>
+    <li><a href="#/chiedi" data-nav="chiedi"><span class="ind"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg></span>Chiedi</a></li>
   </ul>
 </nav>
 
@@ -339,7 +373,7 @@
 'use strict';
 
 /* ---------- Regole di punteggio ---------- */
-const PUNTI = { pulito: 200, semipulito: 150, sporco: 100, chiusura: 100, pozzetto: 100 };
+const PUNTI = { pulito: 200, semipulito: 150, sporco: 100, superb: 250, reale: 300, chiusura: 100, pozzetto: 100 };
 const CARTE = [
   { chiave: 'jolly',   nome: 'Jolly',             valore: 30, carte: [['Jolly', 'jolly']] },
   { chiave: 'pinella', nome: 'Pinella (il 2)',    valore: 20, carte: [['2', ''], ['2', 'rossa']] },
@@ -348,7 +382,14 @@ const CARTE = [
   { chiave: 'basse',   nome: '7, 6, 5, 4, 3',     valore: 5,  carte: [['7', 'rossa'], ['5', ''], ['3', 'rossa']] }
 ];
 const TRAGUARDI = [1005, 1505, 2005, 3005];
-const REGOLAMENTI = { classico: 'Classico', semipulito: 'Con semipulito' };
+const REGOLAMENTI = { italiano: 'Italiano', internazionale: 'Internazionale', classico: 'Senza semipulito' };
+/* Cosa prevede ogni regolamento (Codice di Gara FIBUR 2018; "classico" è la variante casalinga) */
+const REGOLE = {
+  italiano:       { semipulito: true,  speciali: true,  nonGiocato: true,  serveIlPulito: false },
+  internazionale: { semipulito: false, speciali: false, nonGiocato: true,  serveIlPulito: true },
+  classico:       { semipulito: false, speciali: false, nonGiocato: false, serveIlPulito: false }
+};
+const regole = reg => REGOLE[reg] || REGOLE.italiano;
 const TESTO = { normale: ['Normale', '100%'], grande: ['Grande', '115%'], enorme: ['Molto grande', '130%'] };
 
 /* ---------- Icone Material ---------- */
@@ -364,6 +405,9 @@ const ICO = {
   persone: svg('M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z'),
   ripeti: svg('M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'),
   testo: svg('M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z'),
+  chat: svg('M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z'),
+  chiave: svg('M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'),
+  invia: svg('M2.01 21 23 12 2.01 3 2 10l15 2-15 2z'),
   stella: svg('M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'),
   carte: svg('M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z'),
   logo: '<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="14" width="28" height="40" rx="5" transform="rotate(-14 22 34)" fill="#f1ead9" stroke="#d9b44a" stroke-width="2.5"/><rect x="26" y="10" width="30" height="43" rx="5" transform="rotate(8 41 31)" fill="#fbf7ee" stroke="#d9b44a" stroke-width="2.5"/><text x="41" y="41" transform="rotate(8 41 31)" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="24" fill="#0d4a30">B</text></svg>',
@@ -379,10 +423,15 @@ function carica() {
     const testo = localStorage.getItem(CHIAVE);
     if (testo) {
       const d = JSON.parse(testo);
-      if (d && Array.isArray(d.partite)) return Object.assign({ regolamento: 'classico', testo: 'normale' }, d);
+      if (d && Array.isArray(d.partite)) {
+        // le prime versioni chiamavano "semipulito" quello che è il regolamento italiano FIBUR
+        if (d.regolamento === 'semipulito') d.regolamento = 'italiano';
+        d.partite.forEach(p => { if (p.regolamento === 'semipulito') p.regolamento = 'italiano'; });
+        return Object.assign({ regolamento: 'italiano', testo: 'normale' }, d);
+      }
     }
   } catch (e) { /* memoria non disponibile: si parte vuoti */ }
-  return { partite: [], regolamento: 'classico', testo: 'normale' };
+  return { partite: [], regolamento: 'italiano', testo: 'normale' };
 }
 
 function salva() {
@@ -427,8 +476,8 @@ function ricalcolaStato(p) {
 }
 
 /* ---------- Componenti ---------- */
-function segmenti(aria, opzioni, attivo, azione, extra = '') {
-  return `<div class="seg" role="group" aria-label="${esc(aria)}">${opzioni.map(([val, testo]) => {
+function segmenti(aria, opzioni, attivo, azione, extra = '', verticale = false) {
+  return `<div class="seg${verticale ? ' verticale' : ''}" role="group" aria-label="${esc(aria)}">${opzioni.map(([val, testo]) => {
     const on = String(val) === String(attivo);
     return `<button type="button" data-azione="${azione}" data-val="${esc(val)}" ${extra} aria-pressed="${on}">${on ? ICO.check : ''}<span>${testo}</span></button>`;
   }).join('')}</div>`;
@@ -476,7 +525,7 @@ function dialogo({ titolo, testo = '', icona = '', html = '', campo = null, azio
       <h2 id="dlg-titolo">${titolo}</h2>
       ${testo ? `<p>${testo}</p>` : ''}
       ${html}
-      ${campo ? `<div class="tf" style="margin-top:20px"><input id="dlg-in" inputmode="${campo.inputmode || 'text'}" value="${esc(campo.valore)}" aria-describedby="dlg-err"><label for="dlg-in">${campo.etichetta}</label></div><p class="supporto errore" id="dlg-err" aria-live="assertive"></p>` : ''}
+      ${campo ? `<div class="tf" style="margin-top:20px"><input id="dlg-in" type="${campo.tipo || 'text'}" autocomplete="off" inputmode="${campo.inputmode || 'text'}" value="${esc(campo.valore)}" aria-describedby="dlg-err"><label for="dlg-in">${campo.etichetta}</label></div><p class="supporto errore" id="dlg-err" aria-live="assertive"></p>` : ''}
       <div class="dlg-azioni">${azioni.map((a, k) => `<button type="button" class="btn btn-text" data-scelta="${k}">${a.testo}</button>`).join('')}</div>`;
     const chiudi = v => { f.onclick = null; f.oncancel = null; if (f.close) f.close(); else f.removeAttribute('open'); risolvi(v); };
     const conferma = k => {
@@ -501,15 +550,30 @@ function dialogo({ titolo, testo = '', icona = '', html = '', campo = null, azio
 
 /* ---------- Calcolo della manche ---------- */
 function vuotoDettaglio() {
-  return { puliti: 0, semipuliti: 0, sporchi: 0, terra: 0, mano: 0, chiusura: false, pozzetto: false, manuale: false, totaleManuale: 0, contaTerra: null, contaMano: null };
+  return { puliti: 0, semipuliti: 0, sporchi: 0, superb: 0, reali: 0, terra: 0, mano: 0, nonGiocato: 0, chiusura: false, pozzetto: false, manuale: false, totaleManuale: 0, contaTerra: null, contaMano: null, contaNonGiocato: null };
 }
 function puntiAuto(d, regolamento) {
+  const R = regole(regolamento);
   return d.puliti * PUNTI.pulito
-    + (regolamento === 'semipulito' ? d.semipuliti * PUNTI.semipulito : 0)
+    + (R.semipulito ? d.semipuliti * PUNTI.semipulito : 0)
     + d.sporchi * PUNTI.sporco
+    + (R.speciali ? d.superb * PUNTI.superb + d.reali * PUNTI.reale : 0)
     + intero(d.terra) - intero(d.mano)
+    - (R.nonGiocato ? intero(d.nonGiocato) : 0)
     + (d.chiusura ? PUNTI.chiusura : 0)
     - (d.pozzetto ? PUNTI.pozzetto : 0);
+}
+function burrachiTotali(d, regolamento) {
+  const R = regole(regolamento);
+  return d.puliti + d.sporchi + (R.semipulito ? d.semipuliti : 0) + (R.speciali ? d.superb + d.reali : 0);
+}
+/* Chi chiude deve avere almeno un burraco (un pulito nell'internazionale): restituisce l'errore o '' */
+function erroreChiusura(d, regolamento) {
+  if (d.manuale || !d.chiusura) return '';
+  if (regole(regolamento).serveIlPulito) {
+    return d.puliti + (regole(regolamento).speciali ? d.superb + d.reali : 0) > 0 ? '' : 'Nel burraco internazionale per chiudere serve almeno un burraco pulito (Art. 16).';
+  }
+  return burrachiTotali(d, regolamento) > 0 ? '' : 'Per chiudere serve almeno un burraco (Art. 16).';
 }
 function puntiDettaglio(d, regolamento) {
   return d.manuale ? intero(d.totaleManuale) : puntiAuto(d, regolamento);
@@ -531,6 +595,7 @@ function mostra() {
   let manche = false;
   if (sez === 'nuova') { vistaNuova(); pagina = 'nuova'; }
   else if (sez === 'regole') { vistaRegole(); pagina = 'regole'; }
+  else if (sez === 'chiedi') { vistaChiedi(); pagina = 'chiedi'; }
   else if (sez === 'partita' && trovaPartita(id)) {
     if (sotto === 'manche') { manche = true; vistaManche(id, n === undefined ? null : intero(n)); }
     else vistaPartita(id);
@@ -538,6 +603,7 @@ function mostra() {
   else { vistaPartite(); pagina = 'partite'; }
 
   document.body.classList.toggle('senza-nav', manche);
+  if (pagina !== 'chiedi') document.body.classList.remove('con-chat');
   document.querySelectorAll('[data-nav]').forEach(a => {
     if (a.dataset.nav === pagina) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
@@ -604,8 +670,8 @@ function vistaNuova() {
     </section>
     <section class="card">
       <h2>Regolamento</h2>
-      ${segmenti('Regolamento', Object.entries(REGOLAMENTI), bozza.regolamento, 'regolamento-bozza')}
-      <p class="supporto">${bozza.regolamento === 'semipulito' ? 'Burraco pulito 200, semipulito 150, sporco 100.' : 'Burraco pulito 200, sporco 100.'}</p>
+      ${segmenti('Regolamento', Object.entries(REGOLAMENTI), bozza.regolamento, 'regolamento-bozza', '', true)}
+      <p class="supporto">${descrizioneRegolamento(bozza.regolamento)}</p>
       <a class="btn btn-text" href="#/regole" style="margin-top:4px">Leggi le regole</a>
     </section>
     <section class="card">
@@ -733,7 +799,7 @@ function vistaManche(id, n) {
   }
   const N = p.squadre.length;
   const numero = n === null ? p.manche.length + 1 : n + 1;
-  const semi = p.regolamento === 'semipulito';
+  const R = regole(p.regolamento);
   const manuale = calc.dettagli.every(d => d.manuale);
   const chi = i => esc(nomeSquadra(p, i));
   const colonne = f => `<div class="griglia" style="--n:${N}">${p.squadre.map((_, i) => f(i, calc.dettagli[i])).join('')}</div>`;
@@ -759,7 +825,7 @@ function vistaManche(id, n) {
   const carte = (campo, titolo, sotto) => `<div class="voce">
       <div class="voce-titolo"><strong>${titolo}</strong><span>${sotto}</span></div>
       ${colonne((i, d) => `<div class="cella">
-        <input class="campo-num num" id="i-${campo}-${i}" data-campo="${campo}" data-i="${i}" inputmode="numeric" value="${d[campo] || ''}" placeholder="0" aria-label="${titolo}, ${chi(i)}">
+        <input class="campo-num num" id="i-${campo}-${i}" data-campo="${campo}" data-i="${i}" inputmode="numeric" value="${d[campo] || ''}" placeholder="0" aria-label="${titolo}, ${chi(i)}" ${campo === 'nonGiocato' && d.pozzetto ? 'disabled' : ''}>
         <button class="btn btn-text" data-azione="conta" data-i="${i}" data-campo="${campo}" aria-label="Conta le carte una per una: ${titolo.toLowerCase()} di ${chi(i)}">${ICO.carte}Conta</button>
       </div>`)}
     </div>`;
@@ -779,19 +845,22 @@ function vistaManche(id, n) {
     : `<section class="card">
         <h2>Burrachi</h2>
         ${burrachi('puliti', 'Pulito', `+${PUNTI.pulito} · senza matte`)}
-        ${semi ? burrachi('semipuliti', 'Semipulito', `+${PUNTI.semipulito} · matta in fondo`) : ''}
+        ${R.semipulito ? burrachi('semipuliti', 'Semipulito', `+${PUNTI.semipulito} · matta prima o dopo 7 carte`) : ''}
         ${burrachi('sporchi', 'Sporco', `+${PUNTI.sporco} · con una matta`)}
+        ${R.speciali ? burrachi('superb', 'Super burraco', `+${PUNTI.superb} · 8 carte uguali senza matte`) : ''}
+        ${R.speciali ? burrachi('reali', 'Burraco reale', `+${PUNTI.reale} · da A a K senza matte`) : ''}
       </section>
       <section class="card">
         <h2>Carte</h2>
         ${carte('terra', 'A terra', 'si sommano, burrachi compresi')}
         ${carte('mano', 'In mano', 'si sottraggono')}
+        ${R.nonGiocato ? carte('nonGiocato', 'Pozzetto non giocato', 'preso ma non calato: si sottrae') : ''}
       </section>
       <section class="card">
         <h2>Fine mano</h2>
-        ${interruttore('chiusura', 'Ha chiuso', `+${PUNTI.chiusura}`, false)}
+        ${interruttore('chiusura', 'Ha chiuso', `+${PUNTI.chiusura}`, false, `<p class="supporto" style="margin:8px 0 0">${R.serveIlPulito ? 'Per chiudere serve almeno un burraco pulito.' : 'Per chiudere serve almeno un burraco.'}</p>`)}
         ${interruttore('pozzetto', 'Pozzetto non preso', `−${PUNTI.pozzetto}`, true, '<p class="supporto" style="margin:8px 0 0">Chi ha chiuso ha preso per forza il pozzetto.</p>')}
-        <div class="voce">${colonne((i, d) => `<p class="riepilogo num" id="r-${i}">${riepilogo(d, semi)}</p>`)}</div>
+        <div class="voce">${colonne((i, d) => `<p class="riepilogo num" id="r-${i}">${riepilogo(d, p.regolamento)}</p>`)}</div>
       </section>`;
 
   $('#vista').innerHTML = testata(`Manche ${numero}`, esc(REGOLAMENTI[p.regolamento]), '#/partita/' + id,
@@ -802,15 +871,19 @@ function vistaManche(id, n) {
   azione(`<button class="btn fab" data-azione="salva-manche">${ICO.check}Salva manche</button>`, true);
 }
 
-function riepilogo(d, semi) {
+function riepilogo(d, regolamento) {
+  const R = regole(regolamento);
   const parti = [];
   if (d.puliti) parti.push(`${d.puliti}×${PUNTI.pulito}`);
-  if (semi && d.semipuliti) parti.push(`${d.semipuliti}×${PUNTI.semipulito}`);
+  if (R.semipulito && d.semipuliti) parti.push(`${d.semipuliti}×${PUNTI.semipulito}`);
   if (d.sporchi) parti.push(`${d.sporchi}×${PUNTI.sporco}`);
+  if (R.speciali && d.superb) parti.push(`${d.superb}×${PUNTI.superb}`);
+  if (R.speciali && d.reali) parti.push(`${d.reali}×${PUNTI.reale}`);
   if (intero(d.terra)) parti.push(`${intero(d.terra)}`);
   if (d.chiusura) parti.push(`${PUNTI.chiusura}`);
   let s = parti.join(' + ');
   if (intero(d.mano)) s += `${s ? ' ' : ''}− ${intero(d.mano)}`;
+  if (R.nonGiocato && intero(d.nonGiocato)) s += `${s ? ' ' : ''}− ${intero(d.nonGiocato)}`;
   if (d.pozzetto) s += `${s ? ' ' : ''}− ${PUNTI.pozzetto}`;
   return s || '—';
 }
@@ -822,7 +895,7 @@ function aggiornaTotaleManche(i) {
   const el = $('#t-' + i);
   if (el) { el.textContent = fmt(tot); el.classList.toggle('neg', tot < 0); }
   const r = $('#r-' + i);
-  if (r) r.textContent = riepilogo(d, p.regolamento === 'semipulito');
+  if (r) r.textContent = riepilogo(d, p.regolamento);
 }
 
 function htmlConta() {
@@ -840,11 +913,11 @@ function htmlConta() {
 async function apriConta(i, campo) {
   const p = trovaPartita(calc.id);
   const d = calc.dettagli[i];
-  const chiave = campo === 'terra' ? 'contaTerra' : 'contaMano';
+  const chiave = 'conta' + campo[0].toUpperCase() + campo.slice(1);
   contaTemp = Object.assign({}, d[chiave] || {});
   const r = await dialogo({
     titolo: 'Conta le carte',
-    testo: `${esc(nomeSquadra(p, i))} · carte ${campo === 'terra' ? 'a terra' : 'in mano'}`,
+    testo: `${esc(nomeSquadra(p, i))} · ${{ terra: 'carte a terra', mano: 'carte in mano', nonGiocato: 'pozzetto preso e non giocato' }[campo]}`,
     html: `<div id="conta-box" style="margin-top:12px">${htmlConta()}</div>`,
     azioni: [{ testo: 'Annulla', valore: null }, { testo: 'Usa il totale', valore: 'ok' }]
   });
@@ -859,7 +932,9 @@ function salvaManche() {
   const p = trovaPartita(calc.id);
   const chiusi = calc.dettagli.filter(d => !d.manuale && d.chiusura).length;
   if (chiusi > 1) { $('#errore-manche').textContent = 'Può chiudere un solo giocatore o una sola coppia per manche.'; return; }
-  calc.dettagli.forEach(d => { if (d.chiusura) d.pozzetto = false; });
+  const errChiusura = calc.dettagli.map(d => erroreChiusura(d, p.regolamento)).find(Boolean);
+  if (errChiusura) { $('#errore-manche').textContent = errChiusura; return; }
+  calc.dettagli.forEach(d => { if (d.chiusura) d.pozzetto = false; if (d.pozzetto) d.nonGiocato = 0; });
   const punti = calc.dettagli.map(d => puntiDettaglio(d, p.regolamento));
   const manche = { punti, dettagli: calc.dettagli.map(d => JSON.parse(JSON.stringify(d))) };
   const eraFinita = p.finita;
@@ -920,88 +995,341 @@ function apriImpostazioni() {
 }
 
 /* ---------- Schermata: regole ---------- */
+function descrizioneRegolamento(reg) {
+  if (reg === 'italiano') return 'Codice di Gara FIBUR: sporco 100, semipulito 150, pulito 200, super burraco 250, reale 300.';
+  if (reg === 'internazionale') return 'Codice FIBUR internazionale: pulito 200, sporco 100. Per chiudere serve un burraco pulito.';
+  return 'Variante casalinga: solo burraco pulito 200 e sporco 100.';
+}
+
 function vistaRegole() {
-  const semi = dati.regolamento === 'semipulito';
+  const reg = REGOLAMENTI[dati.regolamento] ? dati.regolamento : 'italiano';
+  const R = regole(reg);
   const mini = c => `<div class="mini-carte">${c.carte.map(([v, cl]) => `<span class="mini-carta ${cl}">${v}</span>`).join('')}</div>`;
   const voce = (titolo, testo, valore, classe = '') => `<li><div class="testo"><strong>${titolo}</strong><span>${testo}</span></div><span class="valore num ${classe}">${valore}</span></li>`;
-  $('#vista').innerHTML = testata('Regole e punteggi', 'Leggi il tuo tavolo e fai il conto') + `
-    <section class="card">
-      <h2>Quale regolamento seguite?</h2>
-      ${segmenti('Regolamento', Object.entries(REGOLAMENTI), dati.regolamento, 'regolamento')}
-      <p class="supporto">${semi
-        ? 'Oltre a pulito e sporco esiste il burraco semipulito da 150.'
-        : 'Regolamento FIBUR: esistono solo il burraco pulito e quello sporco.'} Diventa la scelta proposta per le nuove partite.</p>
-    </section>
+  const art = (n, cod) => `<span class="fonte">${cod} · Art. ${n}</span>`;
+  const cod = reg === 'internazionale' ? 'Internazionale' : 'Codice italiano';
 
-    <section class="card">
-      <h2>1. Il valore delle carte</h2>
+  const scelta = `<section class="card">
+      <h2>Quale regolamento seguite?</h2>
+      ${segmenti('Regolamento', Object.entries(REGOLAMENTI), reg, 'regolamento', '', true)}
+      <p class="supporto">${descrizioneRegolamento(reg)} Diventa la scelta proposta per le nuove partite.</p>
+    </section>
+    <a class="card chiedi-link" href="#/chiedi">${ICO.chat}<span><strong>Hai un dubbio su una regola?</strong><br><span class="var piccolo">Chiedi al regolamento: risponde Claude citando l’articolo.</span></span></a>`;
+
+  const valori = `<section class="card">
+      <h2>Il valore delle carte</h2>
       <p>Le carte <strong>calate a terra</strong> si sommano, quelle <strong>rimaste in mano</strong> si sottraggono.</p>
       <ul class="lista-valori" style="margin-top:8px">
         ${CARTE.map(c => `<li><div class="testo">${mini(c)}<span>${c.nome}</span></div><span class="valore num">${c.valore}</span></li>`).join('')}
       </ul>
-      <p class="var piccolo" style="margin-top:8px">Jolly e pinella sono le <strong>matte</strong>: possono sostituire qualsiasi carta.</p>
-    </section>
+      <p class="var piccolo" style="margin-top:8px">Jolly e pinelle (i 2) sono le <strong>matte</strong>. In ogni gioco ci può essere una sola matta, oltre alla pinella messa al suo posto naturale nella scala del suo seme. Non si possono calare combinazioni di sole matte.</p>
+      ${art(10, cod)}
+    </section>`;
 
+  let corpo;
+  if (reg === 'internazionale') {
+    corpo = `
     <section class="card">
-      <h2>2. I burrachi</h2>
-      <p>Un burraco è una combinazione di <strong>almeno 7 carte</strong>. Il premio si aggiunge al valore delle sue carte.</p>
-      <ul class="lista-valori" style="margin-top:8px">
-        ${voce('Burraco pulito', '7 o più carte senza matte. Una pinella al suo posto naturale (A‑2‑3 dello stesso seme) conta come carta normale.', `+${PUNTI.pulito}`, 'premio')}
-        ${semi ? voce('Burraco semipulito', '7 carte naturali consecutive già formate, più una matta aggiunta a un’estremità della scala.', `+${PUNTI.semipulito}`, 'premio') : ''}
-        ${voce('Burraco sporco', '7 o più carte con una matta che sostituisce una carta mancante.', `+${PUNTI.sporco}`, 'premio')}
+      <h2>Le differenze dal burraco italiano</h2>
+      <ul class="lista-numerata">
+        <li><strong>Pulito obbligatorio</strong>: per chiudere la coppia deve avere almeno un burraco pulito.</li>
+        <li><strong>Carte uguali solo di Assi e di 3</strong>: non si possono calare tris di 5, di 10, di re… Se succede, quelle carte vanno scartate.</li>
+        <li><strong>Raccolta dal monte limitata</strong>: si possono raccogliere gli scarti solo se si lega almeno una carta a un gioco aperto o si apre un nuovo gioco (vale anche per la prima carta scoperta).</li>
+        <li><strong>Niente semipulito</strong>, e niente super burraco o burraco reale: esistono solo pulito e sporco.</li>
       </ul>
+      ${art('1-3 e 8', 'Internazionale')}
     </section>
-
+    ${valori}
     <section class="card">
-      <h2>3. Chiusura, pozzetto e carte in mano</h2>
+      <h2>Burrachi</h2>
+      <p>Un burraco è un gioco di <strong>almeno 7 carte</strong>: una scala dello stesso seme oppure carte uguali (solo Assi o 3).</p>
+      <ul class="lista-valori" style="margin-top:8px">
+        ${voce('Burraco pulito', 'Senza matte. La pinella al suo posto naturale (A‑2‑3 dello stesso seme) conta come carta normale.', `+${PUNTI.pulito}`, 'premio')}
+        ${voce('Burraco sporco', 'Con una matta che non sia il 2 naturale.', `+${PUNTI.sporco}`, 'premio')}
+      </ul>
+      <p class="var piccolo" style="margin-top:8px">Scale: da 3 a 13 carte più l’eventuale matta. Combinazioni di Assi o 3: fino a 8 carte più la matta.</p>
+      ${art('11-13', 'Internazionale')}
+    </section>
+    <section class="card">
+      <h2>Chiusura e penalità</h2>
       <ul class="lista-valori">
-        ${voce('Chiusura', 'Chi resta senza carte e chiude la mano.', `+${PUNTI.chiusura}`, 'premio')}
+        ${voce('Chiusura', 'La coppia ha preso il pozzetto, ha almeno un burraco pulito e uno dei due finisce le carte scartandone una.', `+${PUNTI.chiusura}`, 'premio')}
         ${voce('Pozzetto non preso', 'Chi a fine mano non ha raccolto il pozzetto.', `−${PUNTI.pozzetto}`, 'malus-txt')}
+        ${voce('Pozzetto preso e non giocato', 'Si sottrae il valore delle sue carte.', '− valore', 'malus-txt')}
         ${voce('Carte rimaste in mano', 'Si sottrae il valore di ogni carta.', '− valore', 'malus-txt')}
       </ul>
-      <p class="var piccolo" style="margin-top:8px">Per chiudere bisogna aver preso il pozzetto e avere almeno un burraco a terra. Quindi chi chiude non può mai avere la penalità del pozzetto non preso.</p>
+      <p class="var piccolo" style="margin-top:8px">Niente bonus di chiusura se finisce il tallone (le ultime due carte non si giocano) o se dopo il time out nessuno chiude. Non si può chiudere scartando una matta. Chi “chiude” senza burraco pulito non chiude: l’ultimo gioco calato diventa carte penalizzate e si continua.</p>
+      ${art('14, 16, 17 e 31/A', 'Internazionale')}
     </section>
-
     <section class="card">
-      <h2>4. Carte uguali (tris, quattro 7…)</h2>
-      <p>Oltre alle scale dello stesso seme si possono calare <strong>3 o più carte dello stesso valore</strong>, anche di semi diversi.</p>
+      <h2>Esempio di conto</h2>
+      <div class="esempio num"><strong>Chi chiude</strong>1 pulito (200) + 1 sporco (100) + 300 a terra + chiusura (100) = <strong>700</strong></div>
+      <div class="esempio num"><strong>Pozzetto preso e non giocato</strong>1 sporco (100) + 180 a terra − 40 in mano − 75 di pozzetto non giocato = <strong>165</strong></div>
+    </section>
+    <section class="card">
+      <h2>Tempi nei tornei</h2>
+      <p>Le smazzate sono un po’ più lunghe dell’italiano: 30 minuti per 2 smazzate, 40 per 3, 55 per 4. La differenza di punti tra le coppie si converte in Victory Points con le tabelle dello score.</p>
+      ${art('5 e 17', 'Internazionale')}
+    </section>`;
+  } else {
+    corpo = `
+    ${reg === 'classico' ? `<section class="card avviso-card"><h2>Variante casalinga</h2><p>Non è il regolamento ufficiale: il Codice di Gara FIBUR prevede anche il semipulito (150), il super burraco (250) e il burraco reale (300). Qui si contano solo pulito e sporco.</p></section>` : ''}
+    ${valori}
+    <section class="card">
+      <h2>I burrachi</h2>
+      <p>Un burraco è un gioco di <strong>almeno 7 carte</strong>: una scala dello stesso seme oppure carte uguali. Il premio si aggiunge al valore delle sue carte.</p>
+      <ul class="lista-valori" style="margin-top:8px">
+        ${voce('Burraco sporco', '6 o più carte più una matta che non sia il 2 naturale.', `+${PUNTI.sporco}`, 'premio')}
+        ${R.semipulito ? voce('Burraco semipulito', 'La matta precede o segue almeno 7 carte naturali già in fila.', `+${PUNTI.semipulito}`, 'premio') : ''}
+        ${voce('Burraco pulito', '7 o più carte senza matte. La pinella al suo posto naturale (A‑2‑3 dello stesso seme) conta come carta normale.', `+${PUNTI.pulito}`, 'premio')}
+        ${R.speciali ? voce('Super burraco', 'Combinazione di 8 carte uguali senza matte.', `+${PUNTI.superb}`, 'premio') : ''}
+        ${R.speciali ? voce('Burraco reale', 'Scala da Asso a Re (o da 2 ad Asso) senza matte; ammessa solo la pinella dello stesso seme al suo posto.', `+${PUNTI.reale}`, 'premio') : ''}
+      </ul>
+      ${art(13, 'Codice italiano')}
+    </section>
+    <section class="card">
+      <h2>Chiusura e penalità</h2>
+      <ul class="lista-valori">
+        ${voce('Chiusura', 'La coppia ha preso il pozzetto, ha almeno un burraco e uno dei due finisce le carte scartandone una.', `+${PUNTI.chiusura}`, 'premio')}
+        ${voce('Pozzetto non preso', 'Chi a fine mano non ha raccolto il pozzetto.', `−${PUNTI.pozzetto}`, 'malus-txt')}
+        ${R.nonGiocato ? voce('Pozzetto preso e non giocato', 'Si sottrae il valore delle sue carte.', '− valore', 'malus-txt') : ''}
+        ${voce('Carte rimaste in mano', 'Si sottrae il valore di ogni carta.', '− valore', 'malus-txt')}
+      </ul>
+      <p class="var piccolo" style="margin-top:8px">Chi chiude ha per forza preso il pozzetto, quindi non può avere la penalità del pozzetto non preso. Non si può chiudere scartando una matta, né “al monte”. Niente bonus di chiusura dopo il time out, se nel tallone restano due carte o in caso di stallo.</p>
+      ${art('14, 16, 17 e 30', 'Codice italiano')}
+    </section>
+    <section class="card">
+      <h2>Carte uguali (tris, quattro 7…)</h2>
+      <p>Si possono calare <strong>da 3 a 8 carte dello stesso valore</strong>, anche dello stesso seme, più l’eventuale matta.</p>
       <div class="risposta">
         <strong>Se metto giù quattro carte uguali, come si contano?</strong><br>
-        Si somma solo il valore delle carte, senza premi.
-        Quattro 7 = 4 × 5 = <strong>20 punti</strong>. Quattro K = 4 × 10 = <strong>40 punti</strong>. Quattro assi = 4 × 15 = <strong>60 punti</strong>.
+        Si somma solo il valore delle carte, senza premi. Quattro 7 = 4 × 5 = <strong>20 punti</strong>. Quattro K = <strong>40</strong>. Quattro assi = <strong>60</strong>.
       </div>
       <ul>
-        <li>Puoi continuare ad aggiungere carte dello stesso valore: con <strong>7 carte</strong> diventa un burraco.</li>
-        <li>Sette 7 senza matte = burraco pulito: 7 × 5 + ${PUNTI.pulito} = <strong>${7 * 5 + PUNTI.pulito} punti</strong>.</li>
-        <li>Sei 7 più una matta = burraco sporco: premio di ${PUNTI.sporco} più il valore di tutte le carte.</li>
-        <li>In ogni combinazione si può usare <strong>al massimo una matta</strong>.</li>
-        ${semi ? '<li>Nelle carte uguali il 2 è sempre una matta, quindi qui il semipulito non esiste.</li>' : ''}
+        <li>Con <strong>7 carte</strong> diventa un burraco: sette 7 senza matte = 7 × 5 + ${PUNTI.pulito} = <strong>${7 * 5 + PUNTI.pulito} punti</strong>.</li>
+        ${R.speciali ? `<li>Con <strong>8 carte uguali senza matte</strong> è un super burraco: otto 7 = 8 × 5 + ${PUNTI.superb} = <strong>${8 * 5 + PUNTI.superb} punti</strong>.</li>` : ''}
+        <li>Sei carte uguali più una matta = burraco sporco: premio ${PUNTI.sporco} più il valore delle carte.</li>
+        <li>Non si possono aprire due combinazioni dello stesso valore.</li>
       </ul>
+      ${art('12, 13 e 29', 'Codice italiano')}
     </section>
-
     <section class="card">
-      <h2>5. Il conto di una manche</h2>
-      <p>premi dei burrachi + carte a terra + chiusura − carte in mano − pozzetto non preso</p>
+      <h2>Il conto di una manche</h2>
+      <p>premi dei burrachi + carte a terra + chiusura − carte in mano − pozzetto${R.nonGiocato ? ' (non preso o non giocato)' : ' non preso'}</p>
       <div class="esempio num"><strong>Chi chiude</strong>1 pulito (200) + 1 sporco (100) + 340 a terra + chiusura (100) = <strong>740</strong></div>
       <div class="esempio num"><strong>Chi resta con carte in mano</strong>1 sporco (100) + 210 a terra − 45 in mano = <strong>265</strong></div>
       <div class="esempio num"><strong>Pozzetto non preso</strong>0 a terra − 85 in mano − 100 pozzetto = <strong>−185</strong></div>
-      ${semi ? `<div class="esempio num"><strong>Con semipulito</strong>1 semipulito (150) + 1 pulito (200) + 290 a terra + chiusura (100) = <strong>740</strong></div>` : ''}
+      ${R.semipulito ? `<div class="esempio num"><strong>Con semipulito</strong>1 semipulito (150) + 1 pulito (200) + 290 a terra + chiusura (100) = <strong>740</strong></div>` : ''}
+      ${R.speciali ? `<div class="esempio num"><strong>Con super burraco</strong>1 super burraco (250) + 1 sporco (100) + 260 a terra = <strong>610</strong></div>` : ''}
     </section>
-
     <section class="card">
-      <h2>6. Chi vince</h2>
-      <p>Si sommano i punti delle manche. Vince chi arriva per primo al traguardo: da regolamento <strong>2005 punti</strong>, ma puoi sceglierne un altro quando crei la partita o anche dopo. Se in una manche due giocatori superano il traguardo vince il punteggio più alto; in caso di parità si gioca un’altra manche.</p>
+      <h2>Chi vince</h2>
+      <p>Si sommano i punti delle manche. Vince chi arriva per primo al traguardo: di solito <strong>2005 punti</strong>, ma puoi sceglierne un altro quando crei la partita o anche dopo. Se in una manche due giocatori superano il traguardo vince il punteggio più alto; in caso di parità si gioca un’altra manche. Nei tornei si gioca un numero fisso di smazzate e la differenza diventa Victory Points.</p>
     </section>
-
     <section class="card">
       <h2>Promemoria</h2>
       <ul>
-        <li><strong>Scala</strong>: almeno 3 carte consecutive dello stesso seme. L’asso può stare sotto il 2 (A‑2‑3) o sopra il K (Q‑K‑A).</li>
-        <li><strong>Carte uguali</strong>: almeno 3 carte dello stesso valore.</li>
-        <li>Si gioca con 2 mazzi da 52 carte più 4 jolly; a ognuno 11 carte e due pozzetti da 11.</li>
+        <li><strong>Scala</strong>: da 3 a 13 carte consecutive dello stesso seme, più l’eventuale matta. L’asso può stare sotto il 2 o sopra il K.</li>
+        <li>Si gioca con 2 mazzi da 54 carte (4 jolly in tutto); a ognuno 11 carte e due pozzetti da 11.</li>
+        <li>Se il monte degli scarti ha una sola carta, non la si può riscartare subito, a meno di averne un’altra uguale.</li>
       </ul>
+      ${art('1, 4, 8 e 11', 'Codice italiano')}
     </section>`;
+  }
+
+  $('#vista').innerHTML = testata('Regole e punteggi', 'Leggi il tuo tavolo e fai il conto') + scelta + corpo;
   azione('');
+}
+
+/* ---------- Schermata: chiedi al regolamento (chat con Claude) ---------- */
+// La chiave API resta solo su questo dispositivo e va solo ad api.anthropic.com
+const CHIAVE_API = 'burracando-chiave-api';
+const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.0/+esm';
+const MODELLO = 'claude-opus-5-5';
+const ISTRUZIONI = `Sei l'assistente di Burracando, un'app segnapunti per il Burraco. Rispondi in italiano alle domande sui due regolamenti ufficiali FIBUR riportati qui sotto: il Codice di Gara Unico del burraco italiano (gennaio 2018) e il Codice di Gara del Burraco Internazionale (marzo 2018).
+Basati solo su questi testi. Indica sempre il regolamento e l'articolo da cui prendi la risposta (per esempio "Codice italiano, Art. 16"). Se la domanda non dice quale regolamento e la risposta cambia tra italiano e internazionale, spiega in breve entrambe le versioni. Se i testi non rispondono alla domanda, dillo chiaramente invece di indovinare.
+Chi legge sta giocando a carte: usa un tono semplice, frasi brevi e al massimo 150 parole, a meno che non chieda più dettagli. Puoi usare **grassetto** ed elenchi con "- ", niente tabelle né titoli.
+Latency-sensitive; begin your visible answer immediately.`;
+
+let chat = { api: [], vista: [], inCorso: false };
+let testiRegolamenti = null;
+
+function leggiChiave() { try { return localStorage.getItem(CHIAVE_API) || ''; } catch (e) { return ''; } }
+function scriviChiave(v) {
+  try { if (v) localStorage.setItem(CHIAVE_API, v); else localStorage.removeItem(CHIAVE_API); }
+  catch (e) { avviso('Non riesco a salvare la chiave sul dispositivo'); }
+}
+
+async function caricaRegolamenti() {
+  if (testiRegolamenti) return testiRegolamenti;
+  const leggi = f => fetch(f).then(r => { if (!r.ok) throw new Error('regolamento non trovato'); return r.text(); });
+  const [italiano, internazionale] = await Promise.all([leggi('regolamento-italiano.md'), leggi('regolamento-internazionale.md')]);
+  testiRegolamenti = { italiano, internazionale };
+  return testiRegolamenti;
+}
+
+/* Testo semplice → HTML: grassetto ed elenchi, tutto il resto escapato */
+function mdLeggero(t) {
+  let html = '', lista = false;
+  for (const riga of esc(t).split('\n')) {
+    const m = riga.match(/^\s*[-*•]\s+(.*)/);
+    if (m) { if (!lista) { html += '<ul>'; lista = true; } html += `<li>${m[1]}</li>`; continue; }
+    if (lista) { html += '</ul>'; lista = false; }
+    if (riga.trim()) html += `<p>${riga.replace(/^#+\s*/, '')}</p>`;
+  }
+  if (lista) html += '</ul>';
+  return html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+const SUGGERIMENTI = [
+  'Posso chiudere senza burraco pulito?',
+  'Cosa succede se chiudo scartando una matta?',
+  'Quando vale il burraco semipulito?',
+  'Nell’internazionale posso calare tre re?'
+];
+
+function htmlFumetto(m, k) {
+  if (m.ruolo === 'utente') return `<div class="fumetto utente"><span class="sr">Tu: </span>${esc(m.testo)}</div>`;
+  if (m.ruolo === 'errore') return `<div class="fumetto errore" role="alert">${esc(m.testo)}</div>`;
+  const attesa = !m.testo && chat.inCorso && k === chat.vista.length - 1;
+  return `<div class="fumetto assistente"><span class="sr">Risposta: </span>${attesa ? '<span class="sto-pensando">Sto cercando nel regolamento…</span>' : mdLeggero(m.testo)}</div>`;
+}
+
+function vistaChiedi() {
+  const chiave = leggiChiave();
+  const azioni = (chat.vista.length ? `<button class="icon-btn" data-azione="chat-nuova" aria-label="Nuova conversazione">${ICO.piu}</button>` : '')
+    + `<button class="icon-btn" data-azione="chat-chiave" aria-label="Chiave API">${ICO.chiave}</button>`;
+  let html = testata('Chiedi', 'Domande sul regolamento FIBUR', null, azioni);
+
+  if (!chiave) {
+    html += `<section class="card">
+      <h2>Serve una chiave API</h2>
+      <p>Le risposte le scrive Claude, l’intelligenza artificiale di Anthropic, leggendo i due regolamenti FIBUR (italiano e internazionale). Per usarla serve una tua chiave API:</p>
+      <ol class="passi">
+        <li>Crea un account su <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></li>
+        <li>Aggiungi un po’ di credito (bastano pochi euro)</li>
+        <li>In “API keys” crea una chiave e copiala</li>
+        <li>Incollala qui sotto</li>
+      </ol>
+      <p class="var piccolo">Costo indicativo: la prima domanda circa 15 centesimi, le successive (entro 5 minuti) 1‑3 centesimi. La chiave resta solo su questo telefono e viene inviata soltanto ad Anthropic.</p>
+      <button class="btn btn-filled btn-largo" data-azione="chat-chiave" style="margin-top:16px">${ICO.chiave}Inserisci la chiave</button>
+    </section>`;
+    $('#vista').innerHTML = html;
+    azione('');
+    document.body.classList.remove('con-chat');
+    return;
+  }
+
+  html += `<div id="chat-lista" class="chat-lista" aria-live="polite" aria-busy="${chat.inCorso}">`
+    + (chat.vista.length ? chat.vista.map(htmlFumetto).join('') : `<section class="card">
+        <h2>Chiedi pure</h2>
+        <p class="var">Fai una domanda su una regola: Claude risponde citando l’articolo del Codice di Gara. In caso di dubbio fa sempre fede il regolamento.</p>
+        <div class="chips" style="margin-top:12px">${SUGGERIMENTI.map(s => `<button type="button" data-azione="chat-suggerimento" data-testo="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+      </section>`)
+    + `</div>`;
+  $('#vista').innerHTML = html;
+  azione(`<form class="chat-input" id="chat-form">
+      <label class="sr" for="chat-testo">La tua domanda</label>
+      <textarea id="chat-testo" rows="1" placeholder="Scrivi una domanda sul regolamento" maxlength="1000" ${chat.inCorso ? 'disabled' : ''}></textarea>
+      <button class="icon-btn invia" type="submit" aria-label="Invia" ${chat.inCorso ? 'disabled' : ''}>${ICO.invia}</button>
+    </form>`, true);
+  document.body.classList.add('con-chat');
+  const lista = $('#chat-lista');
+  if (chat.vista.length) window.scrollTo(0, document.body.scrollHeight);
+  return lista;
+}
+
+function aggiornaUltimoFumetto() {
+  const lista = $('#chat-lista');
+  if (!lista) return;
+  const k = chat.vista.length - 1;
+  const ultimo = lista.lastElementChild;
+  if (ultimo) ultimo.outerHTML = htmlFumetto(chat.vista[k], k);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+async function chiediAClaude(domanda) {
+  domanda = domanda.trim();
+  if (!domanda || chat.inCorso) return;
+  chat.inCorso = true;
+  chat.vista.push({ ruolo: 'utente', testo: domanda }, { ruolo: 'assistente', testo: '' });
+  chat.api.push({ role: 'user', content: domanda });
+  if (location.hash === '#/chiedi') vistaChiedi();
+  const risposta = chat.vista[chat.vista.length - 1];
+  let Anthropic = null;
+  try {
+    ({ default: Anthropic } = await import(SDK_URL));
+    const testi = await caricaRegolamenti();
+    const client = new Anthropic({ apiKey: leggiChiave(), dangerouslyAllowBrowser: true, fetch: (...a) => window.fetch(...a) });
+    const stream = client.beta.messages.stream({
+      model: MODELLO,
+      max_tokens: 16000,
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      output_config: { effort: 'low' },
+      system: [
+        { type: 'text', text: ISTRUZIONI },
+        {
+          type: 'text',
+          text: `<regolamento nome="Codice di Gara Unico - Burraco italiano FIBUR, gennaio 2018">\n${testi.italiano}\n</regolamento>\n\n<regolamento nome="Codice di Gara del Burraco Internazionale FIBUR, marzo 2018">\n${testi.internazionale}\n</regolamento>`,
+          cache_control: { type: 'ephemeral' }
+        }
+      ],
+      messages: chat.api
+    });
+    for await (const ev of stream) {
+      if (ev.type === 'content_block_delta' && ev.delta.type === 'text_delta') {
+        risposta.testo += ev.delta.text;
+        aggiornaUltimoFumetto();
+      }
+    }
+    const msg = await stream.finalMessage();
+    if (msg.stop_reason === 'refusal') {
+      chat.api.pop();
+      risposta.ruolo = 'errore';
+      risposta.testo = 'Claude non può rispondere a questa domanda. Prova a riformularla.';
+    } else {
+      chat.api.push({ role: 'assistant', content: msg.content });
+      if (msg.stop_reason === 'max_tokens') risposta.testo += '\n\n(risposta interrotta)';
+      if (!risposta.testo.trim()) risposta.testo = 'Nessuna risposta, riprova.';
+    }
+  } catch (e) {
+    chat.api.pop();
+    risposta.ruolo = 'errore';
+    risposta.testo = messaggioErrore(e, Anthropic);
+  }
+  chat.inCorso = false;
+  if (location.hash === '#/chiedi') { vistaChiedi(); const t = $('#chat-testo'); if (t) t.focus(); }
+}
+
+function messaggioErrore(e, Anthropic) {
+  if (Anthropic) {
+    if (e instanceof Anthropic.AuthenticationError) return 'La chiave API non è valida. Toccala in alto a destra per correggerla.';
+    if (e instanceof Anthropic.PermissionDeniedError) return 'Questa chiave API non ha il permesso di usare Claude.';
+    if (e instanceof Anthropic.RateLimitError) return 'Troppe domande in poco tempo: aspetta un minuto e riprova.';
+    if (e instanceof Anthropic.BadRequestError) return /credit/i.test(e.message) ? 'Il credito del tuo account Anthropic è finito: ricaricalo su console.anthropic.com.' : 'Richiesta non accettata dal servizio. Riprova con una domanda diversa.';
+    if (e instanceof Anthropic.APIConnectionError) return 'Nessuna connessione: controlla internet e riprova.';
+    if (e instanceof Anthropic.APIError) return e.status === 529 ? 'Il servizio è sovraccarico in questo momento: riprova tra poco.' : `Errore del servizio (${e.status || '?'}): riprova tra poco.`;
+  }
+  if (/regolamento/.test(e.message)) return 'Non riesco a caricare i regolamenti: controlla la connessione e riprova.';
+  return 'Non riesco a contattare Claude: controlla la connessione e riprova.';
+}
+
+async function impostaChiave() {
+  const attuale = leggiChiave();
+  const azioni = [{ testo: 'Annulla', valore: null }];
+  if (attuale) azioni.push({ testo: 'Rimuovi', valore: 'rimuovi' });
+  azioni.push({ testo: 'Salva', valore: 'ok' });
+  const v = await dialogo({
+    titolo: 'Chiave API di Anthropic',
+    testo: 'Si crea su console.anthropic.com, nella sezione API keys. Resta salvata solo su questo telefono.',
+    campo: { etichetta: 'Chiave API', valore: attuale, tipo: 'password', valida: x => /^sk-ant-\S{20,}$/.test(x.trim()) ? '' : 'La chiave deve iniziare con sk-ant- (copiala per intero).' },
+    azioni
+  });
+  if (v === null) return;
+  if (v === 'rimuovi') { scriviChiave(''); avviso('Chiave rimossa'); }
+  else { scriviChiave(v.trim()); avviso('Chiave salvata'); }
+  vistaChiedi();
 }
 
 /* ---------- Gestione dei tocchi ---------- */
@@ -1094,15 +1422,31 @@ document.addEventListener('click', e => {
       break;
     }
     case 'salva-manche': salvaManche(); break;
+
+    case 'chat-nuova': if (!chat.inCorso) { chat = { api: [], vista: [], inCorso: false }; vistaChiedi(); } break;
+    case 'chat-chiave': impostaChiave(); break;
+    case 'chat-suggerimento': chiediAClaude(el.dataset.testo); break;
   }
+});
+
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'chat-form') return;
+  e.preventDefault();
+  const t = $('#chat-testo');
+  const domanda = t.value;
+  t.value = '';
+  chiediAClaude(domanda);
 });
 
 document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-azione]')) { e.preventDefault(); e.target.click(); }
+  // Invio manda la domanda, Maiusc+Invio va a capo
+  if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'chat-testo') { e.preventDefault(); $('#chat-form').requestSubmit(); }
 });
 
 document.addEventListener('input', e => {
   const el = e.target;
+  if (el.id === 'chat-testo') { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 140) + 'px'; return; }
   const campo = el.dataset.campo;
   if (!campo) return;
   if (campo === 'nome') {
@@ -1112,7 +1456,7 @@ document.addEventListener('input', e => {
   } else if (campo === 'obiettivo') {
     bozza.obiettivo = el.value;
     $('#traguardi').innerHTML = htmlTraguardi();
-  } else if (calc && ['terra', 'mano', 'totaleManuale', 'puliti', 'semipuliti', 'sporchi'].includes(campo)) {
+  } else if (calc && ['terra', 'mano', 'nonGiocato', 'totaleManuale', 'puliti', 'semipuliti', 'sporchi', 'superb', 'reali'].includes(campo)) {
     calc.dettagli[intero(el.dataset.i)][campo] = campo === 'totaleManuale' ? intero(el.value) : Math.max(0, intero(el.value));
     aggiornaTotaleManche(intero(el.dataset.i));
   }
@@ -1125,11 +1469,20 @@ document.addEventListener('change', e => {
   const campo = el.dataset.campo;
   calc.dettagli[i][campo] = el.checked;
   const pozzetto = j => document.querySelector(`input[data-campo="pozzetto"][data-i="${j}"]`);
+  const nonGiocato = j => document.querySelector(`input[data-campo="nonGiocato"][data-i="${j}"]`);
+  // chi non ha preso il pozzetto non può averlo "preso e non giocato"
+  const bloccaNonGiocato = j => {
+    const ng = nonGiocato(j);
+    if (calc.dettagli[j].pozzetto) calc.dettagli[j].nonGiocato = 0;
+    if (ng) { ng.disabled = calc.dettagli[j].pozzetto; if (ng.disabled) ng.value = ''; }
+  };
+  if (campo === 'pozzetto') bloccaNonGiocato(i);
   if (campo === 'chiusura') {
     // chi chiude ha per forza preso il pozzetto: spengo e blocco "pozzetto non preso"
     if (el.checked) calc.dettagli[i].pozzetto = false;
     const pz = pozzetto(i);
     if (pz) { pz.checked = calc.dettagli[i].pozzetto; pz.disabled = el.checked; }
+    bloccaNonGiocato(i);
     // può chiudere una sola squadra: tolgo la chiusura agli altri
     if (el.checked) {
       calc.dettagli.forEach((d, j) => {
