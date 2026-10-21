@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Burracando</title>
+<meta name="description" content="Segnapunti per il Burraco: regole di conteggio, partite a 2, 3 o 4 giocatori, storico delle manche e totali.">
+<meta name="theme-color" content="#0b3d27">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  /* Colori: feltro verde del tavolo, carte color crema, oro per i dettagli.
+     Tutte le coppie testo/sfondo superano il contrasto 4.5:1. */
+  :root {
+    --feltro: #0f4d32;
+    --feltro-scuro: #0b3d27;
+    --feltro-chiaro: #17633f;
+    --crema: #fbf7ee;
+    --crema-2: #f1ead9;
+    --inchiostro: #1b2620;
+    --tenue: #4f5f55;
+    --oro: #d9b44a;
+    --oro-scuro: #7a5c00;
+    --rosso: #b3261e;
+    --verde-ok: #1d6b40;
+    --bordo: #ddd3bd;
+    --ombra: 0 1px 2px rgba(0,0,0,.25), 0 6px 18px rgba(0,0,0,.18);
+    --raggio: 16px;
+    --titoli: Georgia, "Times New Roman", serif;
+    --testo: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: var(--testo);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--crema);
+    background: var(--feltro);
+    background-image: radial-gradient(ellipse at 50% 0%, var(--feltro-chiaro) 0%, var(--feltro) 55%, var(--feltro-scuro) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .app { max-width: 560px; margin: 0 auto; padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
+  h1, h2, h3 { font-family: var(--titoli); line-height: 1.2; margin: 0; }
+  button, input, select { font: inherit; }
+  :focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; border-radius: 8px; }
+  .num { font-variant-numeric: tabular-nums lining-nums; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Testata */
+  .testata { display: flex; align-items: center; gap: 12px; padding: calc(16px + env(safe-area-inset-top)) 0 16px; }
+  .testata h1 { font-size: 1.6rem; color: var(--crema); }
+  .testata .sotto { color: #cfe3d6; font-size: .9rem; }
+  .logo { width: 44px; height: 44px; flex: none; }
+  .indietro { width: 48px; height: 48px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: var(--crema); display: grid; place-items: center; cursor: pointer; flex: none; }
+  .indietro:active { background: rgba(255,255,255,.2); }
+  .testata .titolo-pagina { flex: 1; min-width: 0; }
+  .testata .titolo-pagina h1 { font-size: 1.3rem; overflow-wrap: anywhere; }
+
+  /* Carte (riquadri) */
+  .carta { background: var(--crema); color: var(--inchiostro); border-radius: var(--raggio); box-shadow: var(--ombra); padding: 16px; margin-bottom: 16px; }
+  .carta h2 { font-size: 1.2rem; margin-bottom: 8px; color: var(--feltro-scuro); }
+  .carta h3 { font-size: 1.05rem; margin: 16px 0 6px; color: var(--feltro-scuro); }
+  .carta p { margin: 0 0 8px; }
+  .carta .tenue { color: var(--tenue); font-size: .92rem; }
+  .sezione-titolo { font-family: var(--titoli); font-size: 1.05rem; color: var(--oro); margin: 24px 0 8px; letter-spacing: .02em; }
+
+  /* Pulsanti */
+  .btn { min-height: 48px; padding: 0 20px; border-radius: 999px; border: 0; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform .12s ease, background-color .15s ease; text-decoration: none; }
+  .btn:active { transform: scale(.97); }
+  .btn-primario { background: var(--oro); color: var(--inchiostro); }
+  .btn-primario:active { background: #c9a43c; }
+  .btn-secondario { background: var(--crema-2); color: var(--inchiostro); border: 1px solid var(--bordo); }
+  .btn-chiaro { background: rgba(255,255,255,.12); color: var(--crema); }
+  .btn-pericolo { background: transparent; color: var(--rosso); border: 1px solid #e3b4b0; }
+  .btn-largo { width: 100%; }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+  .barra-azione { position: fixed; left: 0; right: 0; bottom: calc(72px + env(safe-area-inset-bottom)); padding: 0 16px 12px; pointer-events: none; z-index: 5; }
+  .barra-azione > div { max-width: 528px; margin: 0 auto; pointer-events: auto; }
+  .barra-azione .btn { width: 100%; box-shadow: 0 6px 20px rgba(0,0,0,.35); min-height: 56px; font-size: 1.05rem; }
+  body.senza-nav .barra-azione { bottom: env(safe-area-inset-bottom); padding-bottom: 16px; }
+
+  /* Navigazione in basso */
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; background: var(--feltro-scuro); border-top: 1px solid rgba(255,255,255,.1); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
+  .nav ul { list-style: none; margin: 0 auto; padding: 0; display: flex; max-width: 560px; }
+  .nav li { flex: 1; }
+  .nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 64px; color: #b9d3c3; text-decoration: none; font-size: .8rem; font-weight: 600; }
+  .nav a svg { width: 24px; height: 24px; }
+  .nav a[aria-current="page"] { color: var(--oro); }
+  body.senza-nav .nav { display: none; }
+
+  /* Elenco partite */
+  .partita-voce { display: block; width: 100%; text-align: left; border: 0; cursor: pointer; font: inherit; }
+  .partita-voce:active { transform: scale(.99); }
+  .voce-testa { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .voce-data { color: var(--tenue); font-size: .85rem; }
+  .etichetta { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--crema-2); color: var(--oro-scuro); border: 1px solid var(--bordo); white-space: nowrap; }
+  .etichetta.verde { color: var(--verde-ok); }
+  .voce-riga { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 4px 0; }
+  .voce-riga .nome { overflow-wrap: anywhere; }
+  .voce-riga .punti { font-weight: 700; font-size: 1.15rem; }
+  .voce-riga.testa .nome::after { content: " ★"; color: var(--oro-scuro); }
+  .vuoto { text-align: center; padding: 32px 16px; }
+  .vuoto svg { width: 72px; height: 72px; margin-bottom: 8px; }
+
+  /* Moduli */
+  label.campo { display: block; font-weight: 600; margin-bottom: 6px; }
+  .input { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--bordo); background: #fff; color: var(--inchiostro); font-size: 1rem; }
+  .input:focus { border-color: var(--feltro); outline: none; box-shadow: 0 0 0 3px rgba(15,77,50,.2); }
+  .riga-giocatore { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .riga-giocatore .input { flex: 1; }
+  .btn-icona { width: 48px; height: 48px; border-radius: 12px; border: 1px solid var(--bordo); background: var(--crema-2); color: var(--inchiostro); display: grid; place-items: center; cursor: pointer; flex: none; }
+  .btn-icona svg { width: 20px; height: 20px; }
+  .btn-icona:disabled { opacity: .4; cursor: default; }
+  .aiuto { font-size: .9rem; color: var(--tenue); margin: 4px 0 0; }
+  .modalita { display: flex; gap: 10px; align-items: center; background: #e9f2ec; color: var(--feltro-scuro); padding: 10px 12px; border-radius: 12px; margin-top: 12px; font-weight: 600; }
+  .modalita svg { width: 22px; height: 22px; flex: none; }
+
+  /* Selettore a segmenti */
+  .segmenti { display: flex; background: var(--crema-2); border: 1px solid var(--bordo); border-radius: 14px; padding: 4px; gap: 4px; }
+  .segmenti button { flex: 1; min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--inchiostro); cursor: pointer; font-weight: 600; padding: 4px 8px; line-height: 1.2; }
+  .segmenti button[aria-pressed="true"] { background: var(--feltro); color: var(--crema); }
+  .segmenti.scuro { background: rgba(0,0,0,.2); border-color: rgba(255,255,255,.15); }
+  .segmenti.scuro button { color: var(--crema); }
+  .segmenti.scuro button[aria-pressed="true"] { background: var(--oro); color: var(--inchiostro); }
+
+  /* Tabellone della partita */
+  .tabellone { display: grid; gap: 10px; }
+  .tabellone.c2 { grid-template-columns: 1fr 1fr; }
+  .tabellone.c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .squadra { background: var(--crema); color: var(--inchiostro); border-radius: var(--raggio); padding: 12px; box-shadow: var(--ombra); text-align: center; position: relative; border: 3px solid transparent; }
+  .squadra.in-testa { border-color: var(--oro); }
+  .squadra .nome { font-weight: 700; font-size: .95rem; overflow-wrap: anywhere; line-height: 1.25; }
+  .squadra .totale { font-family: var(--titoli); font-size: 2.2rem; font-weight: 700; color: var(--feltro-scuro); line-height: 1.1; margin: 4px 0; }
+  .tabellone.c3 .squadra .totale { font-size: 1.7rem; }
+  .squadra .totale.neg { color: var(--rosso); }
+  .squadra .manca { font-size: .8rem; color: var(--tenue); }
+  .progresso { height: 6px; background: var(--crema-2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .progresso span { display: block; height: 100%; background: var(--oro); border-radius: 3px; }
+  .corona { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--oro); color: var(--inchiostro); border-radius: 999px; padding: 1px 10px; font-size: .72rem; font-weight: 800; letter-spacing: .04em; }
+  .info-partita { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+  .info-partita .etichetta { background: rgba(255,255,255,.1); color: var(--crema); border-color: rgba(255,255,255,.2); }
+
+  .tabella-manche { width: 100%; border-collapse: collapse; }
+  .tabella-manche th, .tabella-manche td { padding: 10px 6px; text-align: right; border-bottom: 1px solid var(--bordo); }
+  .tabella-manche th:first-child, .tabella-manche td:first-child { text-align: left; color: var(--tenue); width: 3.2em; }
+  .tabella-manche thead th { font-size: .82rem; color: var(--tenue); font-weight: 700; vertical-align: bottom; overflow-wrap: anywhere; }
+  .tabella-manche tbody tr { cursor: pointer; }
+  .tabella-manche tbody tr:active { background: var(--crema-2); }
+  .tabella-manche td.neg { color: var(--rosso); }
+  .tabella-manche tfoot td { font-weight: 800; font-size: 1.1rem; border-bottom: 0; border-top: 2px solid var(--feltro); color: var(--feltro-scuro); }
+  .tabella-manche td.modifica { width: 36px; color: var(--tenue); text-align: center; }
+  .tabella-manche td.modifica svg { width: 18px; height: 18px; vertical-align: middle; }
+
+  .vincitore { text-align: center; background: linear-gradient(180deg, #fff6d6, var(--crema)); border: 2px solid var(--oro); }
+  .vincitore .trofeo { width: 56px; height: 56px; color: var(--oro-scuro); }
+  .vincitore h2 { color: var(--oro-scuro); }
+
+  /* Calcolatrice manche */
+  .calc-squadra .calc-testa { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .calc-squadra .calc-testa h2 { margin: 0; overflow-wrap: anywhere; }
+  .calc-totale { font-family: var(--titoli); font-size: 1.8rem; font-weight: 700; color: var(--feltro-scuro); white-space: nowrap; }
+  .calc-totale.neg { color: var(--rosso); }
+  .voce-calc { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--bordo); }
+  .voce-calc .descr { flex: 1; min-width: 0; }
+  .voce-calc .descr strong { display: block; }
+  .voce-calc .descr span { font-size: .85rem; color: var(--tenue); }
+  .stepper { display: flex; align-items: center; gap: 4px; flex: none; }
+  .stepper button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--bordo); background: var(--crema-2); color: var(--inchiostro); cursor: pointer; display: grid; place-items: center; }
+  .stepper button svg { width: 18px; height: 18px; }
+  .stepper button:active { background: var(--bordo); }
+  .stepper output { min-width: 2ch; text-align: center; font-weight: 800; font-size: 1.2rem; }
+  .input-punti { width: 104px; text-align: right; font-weight: 700; font-size: 1.1rem; }
+  .interruttore { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--bordo); cursor: pointer; min-height: 56px; }
+  .interruttore input { appearance: none; -webkit-appearance: none; width: 52px; height: 32px; border-radius: 999px; background: #cfc6b2; position: relative; cursor: pointer; flex: none; transition: background-color .15s ease; margin: 0; }
+  .interruttore input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s ease; }
+  .interruttore input:checked { background: var(--feltro); }
+  .interruttore input:checked::after { transform: translateX(20px); }
+  .interruttore.malus input:checked { background: var(--rosso); }
+  .link-conta { background: none; border: 0; color: var(--feltro); font-weight: 700; text-decoration: underline; padding: 10px 0; min-height: 44px; cursor: pointer; font-size: .9rem; }
+  .conta-carte { background: #f6f0e1; border-radius: 12px; padding: 4px 12px; margin-bottom: 8px; }
+  .conta-carte .voce-calc:first-child { border-top: 0; }
+  .conta-carte .azzera { display: flex; justify-content: flex-end; }
+  .mini-carta { display: inline-grid; place-items: center; min-width: 30px; height: 40px; padding: 0 4px; border-radius: 5px; background: #fff; border: 1px solid #c9bfa8; font-family: var(--titoli); font-weight: 700; font-size: .85rem; color: var(--inchiostro); margin-right: 3px; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
+  .mini-carta.rossa { color: var(--rosso); }
+  .mini-carta.jolly { color: var(--oro-scuro); font-size: .7rem; }
+  .riepilogo-calc { font-size: .85rem; color: var(--tenue); margin-top: 6px; }
+  .manuale-box { padding-top: 8px; border-top: 1px solid var(--bordo); }
+
+  /* Regole */
+  .tabella-valori { width: 100%; border-collapse: collapse; }
+  .tabella-valori td { padding: 8px 0; border-bottom: 1px solid var(--bordo); vertical-align: middle; }
+  .tabella-valori td:last-child { text-align: right; font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+  .tabella-valori tr:last-child td { border-bottom: 0; }
+  .premio { color: var(--verde-ok); }
+  .malus-txt { color: var(--rosso); }
+  .esempio { background: #f6f0e1; border-left: 4px solid var(--oro); border-radius: 8px; padding: 10px 12px; margin: 10px 0; font-size: .95rem; }
+  .esempio .conto { font-variant-numeric: tabular-nums; }
+  .risposta { background: #e9f2ec; border-left: 4px solid var(--feltro); border-radius: 8px; padding: 10px 12px; margin: 10px 0; }
+  .carta ul { margin: 0 0 8px; padding-left: 20px; }
+  .carta li { margin-bottom: 4px; }
+
+  /* Finestra e avvisi */
+  dialog { border: 0; border-radius: 20px; padding: 24px; max-width: min(92vw, 420px); background: var(--crema); color: var(--inchiostro); box-shadow: 0 20px 60px rgba(0,0,0,.5); text-align: center; }
+  dialog::backdrop { background: rgba(0,0,0,.55); }
+  dialog h2 { color: var(--oro-scuro); font-size: 1.5rem; margin: 8px 0; }
+  dialog .trofeo { width: 64px; height: 64px; color: var(--oro-scuro); }
+  dialog .azioni { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .avviso { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: var(--inchiostro); color: var(--crema); padding: 12px 20px; border-radius: 999px; box-shadow: var(--ombra); opacity: 0; transition: opacity .2s ease, transform .2s ease; z-index: 20; pointer-events: none; max-width: calc(100vw - 32px); text-align: center; }
+  .avviso.visibile { opacity: 1; transform: translate(-50%, 0); }
+  .errore { color: var(--rosso); font-weight: 600; font-size: .9rem; margin: 8px 0 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <main id="vista" tabindex="-1"></main>
+</div>
+
+<div class="barra-azione" id="barra-azione" hidden><div></div></div>
+
+<nav class="nav" aria-label="Sezioni">
+  <ul>
+    <li><a href="#/partite" data-nav="partite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>Partite</a></li>
+    <li><a href="#/nuova" data-nav="nuova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Nuova</a></li>
+    <li><a href="#/regole" data-nav="regole"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h8M8 11h6"/></svg>Regole</a></li>
+  </ul>
+</nav>
+
+<dialog id="finestra"></dialog>
+<div class="avviso" id="avviso" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* ---------- Regole di punteggio ---------- */
+const PUNTI = { pulito: 200, semipulito: 150, sporco: 100, chiusura: 100, pozzetto: 100 };
+const CARTE = [
+  { chiave: 'jolly',   nome: 'Jolly',         valore: 30, carte: [['Jolly', 'jolly']] },
+  { chiave: 'pinella', nome: 'Pinella (il 2)', valore: 20, carte: [['2', ''], ['2', 'rossa']] },
+  { chiave: 'asso',    nome: 'Asso',          valore: 15, carte: [['A', ''], ['A', 'rossa']] },
+  { chiave: 'alte',    nome: 'K, Q, J, 10, 9, 8', valore: 10, carte: [['K', ''], ['Q', 'rossa'], ['10', '']] },
+  { chiave: 'basse',   nome: '7, 6, 5, 4, 3', valore: 5, carte: [['7', 'rossa'], ['5', ''], ['3', 'rossa']] }
+];
+const TRAGUARDI = [1005, 1505, 2005, 3005];
+const REGOLAMENTI = {
+  classico: 'Classico',
+  semipulito: 'Con semipulito'
+};
+
+/* ---------- Icone SVG ---------- */
+const ICONE = {
+  indietro: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
+  piu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  meno: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
+  cestino: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>',
+  matita: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  trofeo: '<svg class="trofeo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>',
+  persone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg>',
+  ripeti: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/></svg>',
+  salva: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>',
+  logo: '<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="12" width="30" height="42" rx="5" transform="rotate(-12 21 33)" fill="#f1ead9" stroke="#d9b44a" stroke-width="2"/><rect x="22" y="8" width="32" height="46" rx="5" fill="#fbf7ee" stroke="#d9b44a" stroke-width="2.5"/><text x="38" y="41" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="26" fill="#0f4d32">B</text></svg>',
+  carte: '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="14" width="28" height="40" rx="5" transform="rotate(-14 22 34)" fill="#f1ead9" stroke="#d9b44a" stroke-width="2"/><rect x="26" y="10" width="30" height="42" rx="5" transform="rotate(10 41 31)" fill="#fbf7ee" stroke="#d9b44a" stroke-width="2"/></svg>'
+};
+
+/* ---------- Dati salvati sul telefono ---------- */
+const CHIAVE = 'burracando-dati';
+let dati = carica();
+
+function carica() {
+  try {
+    const testo = localStorage.getItem(CHIAVE);
+    if (testo) {
+      const d = JSON.parse(testo);
+      if (d && Array.isArray(d.partite)) return Object.assign({ regolamento: 'classico' }, d);
+    }
+  } catch (e) { /* memoria non disponibile: si parte vuoti */ }
+  return { partite: [], regolamento: 'classico' };
+}
+
+function salva() {
+  try { localStorage.setItem(CHIAVE, JSON.stringify(dati)); }
+  catch (e) { avviso('Attenzione: non riesco a salvare sul dispositivo'); }
+}
+
+/* ---------- Utilità ---------- */
+const $ = sel => document.querySelector(sel);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => (n < 0 ? '−' : '') + Math.abs(n).toLocaleString('it-IT');
+const intero = v => { const n = parseInt(String(v).replace(/[^\d-]/g, ''), 10); return isNaN(n) ? 0 : n; };
+const nuovoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const dataBreve = ms => new Date(ms).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+
+function avviso(testo) {
+  const el = $('#avviso');
+  el.textContent = testo;
+  el.classList.add('visibile');
+  clearTimeout(avviso.t);
+  avviso.t = setTimeout(() => el.classList.remove('visibile'), 2200);
+}
+
+function trovaPartita(id) { return dati.partite.find(p => p.id === id); }
+function nomeSquadra(p, i) { return p.squadre[i].membri.map(m => p.giocatori[m]).join(' e '); }
+function totali(p) { return p.squadre.map((_, i) => p.manche.reduce((s, m) => s + (m.punti[i] || 0), 0)); }
+
+/* La partita finisce quando qualcuno arriva al punteggio per vincere
+   ed è da solo in testa; in caso di parità in testa si gioca un'altra manche. */
+function ricalcolaStato(p) {
+  const t = totali(p);
+  const max = Math.max(...t);
+  const primi = t.filter(x => x === max).length;
+  if (max >= p.obiettivo && primi === 1) {
+    p.finita = true;
+    p.vincitore = t.indexOf(max);
+  } else {
+    p.finita = false;
+    p.vincitore = null;
+  }
+}
+
+/* ---------- Calcolo della manche ---------- */
+function vuotoDettaglio() {
+  return { puliti: 0, semipuliti: 0, sporchi: 0, terra: 0, mano: 0, chiusura: false, pozzetto: false, manuale: false, totaleManuale: 0, contaTerra: null, contaMano: null };
+}
+function puntiDettaglio(d, regolamento) {
+  if (d.manuale) return intero(d.totaleManuale);
+  return d.puliti * PUNTI.pulito
+    + (regolamento === 'semipulito' ? d.semipuliti * PUNTI.semipulito : 0)
+    + d.sporchi * PUNTI.sporco
+    + intero(d.terra) - intero(d.mano)
+    + (d.chiusura ? PUNTI.chiusura : 0)
+    - (d.pozzetto ? PUNTI.pozzetto : 0);
+}
+function sommaCarte(conta) {
+  return CARTE.reduce((s, c) => s + (conta[c.chiave] || 0) * c.valore, 0);
+}
+
+/* ---------- Navigazione ---------- */
+let bozza = null;   // partita in preparazione
+let calc = null;    // manche in compilazione
+
+function vai(h) { location.hash = h; }
+
+function mostra() {
+  const parti = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const [sez, id, sotto, n] = parti;
+  let pagina = 'partite';
+  if (sez === 'nuova') { vistaNuova(); pagina = 'nuova'; }
+  else if (sez === 'regole') { vistaRegole(); pagina = 'regole'; }
+  else if (sez === 'partita' && trovaPartita(id)) {
+    if (sotto === 'manche') { vistaManche(id, n === undefined ? null : intero(n)); pagina = null; }
+    else { vistaPartita(id); pagina = null; }
+  }
+  else vistaPartite();
+
+  document.body.classList.toggle('senza-nav', pagina === null && sotto === 'manche');
+  document.querySelectorAll('[data-nav]').forEach(a => {
+    if (a.dataset.nav === pagina) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  window.scrollTo(0, 0);
+}
+
+function testata(titolo, sotto, indietro) {
+  if (indietro) {
+    return `<header class="testata">
+      <button class="indietro" data-azione="indietro" data-dest="${esc(indietro)}" aria-label="Indietro">${ICONE.indietro}</button>
+      <div class="titolo-pagina"><h1>${titolo}</h1>${sotto ? `<div class="sotto">${sotto}</div>` : ''}</div>
+    </header>`;
+  }
+  return `<header class="testata">${ICONE.logo}<div><h1>${titolo}</h1>${sotto ? `<div class="sotto">${sotto}</div>` : ''}</div></header>`;
+}
+
+function barraAzione(html) {
+  const b = $('#barra-azione');
+  b.hidden = !html;
+  b.firstElementChild.innerHTML = html || '';
+}
+
+/* ---------- Schermata: elenco partite ---------- */
+function vistaPartite() {
+  const inCorso = dati.partite.filter(p => !p.finita).sort((a, b) => b.aggiornata - a.aggiornata);
+  const finite = dati.partite.filter(p => p.finita).sort((a, b) => b.aggiornata - a.aggiornata);
+  let html = testata('Burracando', 'Il segnapunti del Burraco');
+
+  if (!dati.partite.length) {
+    html += `<section class="carta vuoto">
+      ${ICONE.carte}
+      <h2>Nessuna partita</h2>
+      <p class="tenue">Crea una partita, inserisci i giocatori e segna i punti manche dopo manche.</p>
+    </section>`;
+  }
+  if (inCorso.length) html += `<h2 class="sezione-titolo">In corso</h2>` + inCorso.map(vocePartita).join('');
+  if (finite.length) html += `<h2 class="sezione-titolo">Finite</h2>` + finite.map(vocePartita).join('');
+
+  $('#vista').innerHTML = html;
+  barraAzione(`<a class="btn btn-primario" href="#/nuova">${ICONE.piu}Nuova partita</a>`);
+}
+
+function vocePartita(p) {
+  const t = totali(p);
+  const max = Math.max(...t);
+  const righe = p.squadre.map((_, i) => `<div class="voce-riga${p.manche.length && t[i] === max ? ' testa' : ''}">
+      <span class="nome">${esc(nomeSquadra(p, i))}</span><span class="punti num">${fmt(t[i])}</span></div>`).join('');
+  const stato = p.finita
+    ? `<span class="etichetta verde">Vince ${esc(nomeSquadra(p, p.vincitore))}</span>`
+    : `<span class="etichetta">${p.manche.length} ${p.manche.length === 1 ? 'manche' : 'manche'}</span>`;
+  return `<button class="carta partita-voce" data-azione="apri" data-id="${p.id}">
+    <div class="voce-testa"><span class="voce-data">${dataBreve(p.creata)} · a ${fmt(p.obiettivo)}</span>${stato}</div>
+    ${righe}
+  </button>`;
+}
+
+/* ---------- Schermata: nuova partita ---------- */
+function vistaNuova() {
+  if (!bozza) bozza = { nomi: ['', ''], compagno: 2, regolamento: dati.regolamento, obiettivo: 2005, errore: '' };
+  const n = bozza.nomi.length;
+  const righe = bozza.nomi.map((nome, i) => `<div class="riga-giocatore">
+      <label class="sr" for="g${i}">Giocatore ${i + 1}</label>
+      <input class="input" id="g${i}" data-campo="nome" data-i="${i}" value="${esc(nome)}" placeholder="Giocatore ${i + 1}" autocomplete="off" maxlength="24">
+      <button class="btn-icona" data-azione="togli-giocatore" data-i="${i}" ${n <= 2 ? 'disabled' : ''} aria-label="Togli giocatore ${i + 1}">${ICONE.cestino}</button>
+    </div>`).join('');
+
+  $('#vista').innerHTML = testata('Nuova partita', 'Da 2 a 4 giocatori') + `
+    <section class="carta">
+      <h2>Giocatori</h2>
+      ${righe}
+      ${n < 4 ? `<button class="btn btn-secondario btn-largo" data-azione="aggiungi-giocatore">${ICONE.piu}Aggiungi giocatore</button>` : ''}
+      <div class="modalita">${ICONE.persone}<span id="modalita">${testoModalita(n)}</span></div>
+      ${n === 4 ? `<div id="coppie" style="margin-top:16px">${htmlCoppie()}</div>` : ''}
+    </section>
+    <section class="carta">
+      <h2>Regolamento</h2>
+      <div class="segmenti" role="group" aria-label="Regolamento">
+        ${Object.entries(REGOLAMENTI).map(([k, v]) => `<button data-azione="regolamento-bozza" data-val="${k}" aria-pressed="${bozza.regolamento === k}">${v}</button>`).join('')}
+      </div>
+      <p class="aiuto">${bozza.regolamento === 'semipulito' ? 'Burraco pulito 200, semipulito 150, sporco 100.' : 'Burraco pulito 200, sporco 100.'} <a href="#/regole" style="color:var(--feltro)">Vedi le regole</a></p>
+    </section>
+    <section class="carta">
+      <h2>A quanti punti si vince?</h2>
+      <div class="segmenti" role="group" aria-label="Punti per vincere">
+        ${TRAGUARDI.map(v => `<button data-azione="traguardo" data-val="${v}" aria-pressed="${intero(bozza.obiettivo) === v}">${fmt(v)}</button>`).join('')}
+      </div>
+      <label class="campo" for="obiettivo" style="margin-top:16px">Oppure scrivi tu il traguardo</label>
+      <input class="input num" id="obiettivo" data-campo="obiettivo" inputmode="numeric" value="${bozza.obiettivo}">
+      <p class="aiuto">Da regolamento si gioca a 2005. Vince chi li raggiunge per primo. Potrai cambiarlo anche a partita iniziata.</p>
+      ${bozza.errore ? `<p class="errore" role="alert">${esc(bozza.errore)}</p>` : ''}
+    </section>`;
+  barraAzione(`<button class="btn btn-primario" data-azione="crea">${ICONE.salva}Inizia la partita</button>`);
+}
+
+function aggiornaTraguardi() {
+  document.querySelectorAll('[data-azione="traguardo"]').forEach(b =>
+    b.setAttribute('aria-pressed', intero(b.dataset.val) === intero(bozza.obiettivo)));
+}
+
+function testoModalita(n) {
+  if (n === 2) return 'Uno contro uno';
+  if (n === 3) return 'Tutti contro tutti, ognuno per sé';
+  return 'Due coppie, una contro l’altra';
+}
+
+function htmlCoppie() {
+  const nome = i => esc(bozza.nomi[i].trim() || `Giocatore ${i + 1}`);
+  return `<label class="campo">Chi gioca in coppia con ${nome(0)}?</label>
+    <div class="segmenti" role="group" aria-label="Compagno del giocatore 1">
+      ${[1, 2, 3].map(i => `<button data-azione="compagno" data-val="${i}" aria-pressed="${bozza.compagno === i}">${nome(i)}</button>`).join('')}
+    </div>
+    <p class="aiuto">Coppie: <strong>${nome(0)} e ${nome(bozza.compagno)}</strong> contro <strong>${[1, 2, 3].filter(i => i !== bozza.compagno).map(nome).join(' e ')}</strong></p>`;
+}
+
+function creaPartita() {
+  const nomi = bozza.nomi.map((s, i) => s.trim() || `Giocatore ${i + 1}`);
+  const obiettivo = intero(bozza.obiettivo);
+  if (obiettivo < 100) { bozza.errore = 'Scrivi un punteggio per vincere di almeno 100 punti.'; vistaNuova(); return; }
+  let squadre;
+  if (nomi.length === 4) {
+    const altri = [1, 2, 3].filter(i => i !== bozza.compagno);
+    squadre = [{ membri: [0, bozza.compagno] }, { membri: altri }];
+  } else {
+    squadre = nomi.map((_, i) => ({ membri: [i] }));
+  }
+  const p = { id: nuovoId(), creata: Date.now(), aggiornata: Date.now(), giocatori: nomi, squadre, regolamento: bozza.regolamento, obiettivo, manche: [], finita: false, vincitore: null };
+  dati.partite.push(p);
+  salva();
+  bozza = null;
+  vai('#/partita/' + p.id);
+}
+
+/* ---------- Schermata: partita ---------- */
+function vistaPartita(id) {
+  const p = trovaPartita(id);
+  const t = totali(p);
+  const max = Math.max(...t);
+  const cols = p.squadre.length;
+  const titolo = p.squadre.map((_, i) => esc(nomeSquadra(p, i))).join(' <span style="color:var(--oro)">vs</span> ');
+
+  const tabellone = `<div class="tabellone c${cols}">${p.squadre.map((_, i) => {
+    const inTesta = p.manche.length && t[i] === max;
+    const perc = Math.max(0, Math.min(100, t[i] / p.obiettivo * 100));
+    const manca = p.obiettivo - t[i];
+    return `<div class="squadra${inTesta ? ' in-testa' : ''}">
+      ${p.finita && p.vincitore === i ? '<span class="corona">VINCE</span>' : ''}
+      <div class="nome">${esc(nomeSquadra(p, i))}</div>
+      <div class="totale num${t[i] < 0 ? ' neg' : ''}">${fmt(t[i])}</div>
+      <div class="progresso" aria-hidden="true"><span style="width:${perc}%"></span></div>
+      <div class="manca">${manca > 0 ? `mancano ${fmt(manca)}` : 'obiettivo raggiunto'}</div>
+    </div>`;
+  }).join('')}</div>`;
+
+  const info = `<div class="info-partita">
+    <span class="etichetta">${REGOLAMENTI[p.regolamento]}</span>
+    <button class="etichetta" data-azione="cambia-traguardo" data-id="${p.id}" style="cursor:pointer;font:inherit;font-size:.78rem;font-weight:700;min-height:32px">Si vince a ${fmt(p.obiettivo)} · cambia</button>
+    <span class="etichetta">${dataBreve(p.creata)}</span>
+  </div>`;
+
+  const vincitore = p.finita ? `<section class="carta vincitore" style="margin-top:16px">
+      ${ICONE.trofeo}
+      <h2>Vince ${esc(nomeSquadra(p, p.vincitore))}</h2>
+      <p class="num">con ${fmt(t[p.vincitore])} punti in ${p.manche.length} manche</p>
+      <button class="btn btn-secondario" data-azione="rivincita" data-id="${p.id}">${ICONE.ripeti}Rivincita, stessi giocatori</button>
+    </section>` : '';
+
+  let storico;
+  if (!p.manche.length) {
+    storico = `<section class="carta"><h2>Storico manche</h2><p class="tenue">Nessuna manche ancora. A fine mano tocca “Aggiungi manche” e conta il tavolo di ognuno.</p></section>`;
+  } else {
+    storico = `<section class="carta">
+      <h2>Storico manche</h2>
+      <p class="tenue">Tocca una manche per modificarla o eliminarla.</p>
+      <table class="tabella-manche num">
+        <thead><tr><th scope="col">#</th>${p.squadre.map((_, i) => `<th scope="col">${esc(nomeSquadra(p, i))}</th>`).join('')}<th><span class="sr">Modifica</span></th></tr></thead>
+        <tbody>${p.manche.map((m, n) => `<tr data-azione="modifica-manche" data-id="${p.id}" data-n="${n}" tabindex="0" aria-label="Modifica manche ${n + 1}">
+          <td>${n + 1}</td>${m.punti.map(x => `<td class="${x < 0 ? 'neg' : ''}">${fmt(x)}</td>`).join('')}<td class="modifica">${ICONE.matita}</td></tr>`).join('')}</tbody>
+        <tfoot><tr><td>Tot.</td>${t.map(x => `<td>${fmt(x)}</td>`).join('')}<td></td></tr></tfoot>
+      </table>
+    </section>`;
+  }
+
+  $('#vista').innerHTML = testata(titolo, null, '#/partite') + tabellone + info + vincitore
+    + `<h2 class="sezione-titolo">Manche</h2>` + storico
+    + `<button class="btn btn-pericolo btn-largo" data-azione="elimina-partita" data-id="${p.id}">${ICONE.cestino}Elimina partita</button>`;
+
+  barraAzione(p.finita ? '' : `<button class="btn btn-primario" data-azione="nuova-manche" data-id="${p.id}">${ICONE.piu}Aggiungi manche ${p.manche.length + 1}</button>`);
+}
+
+/* ---------- Schermata: calcolatrice della manche ---------- */
+function vistaManche(id, n) {
+  const p = trovaPartita(id);
+  const esistente = n !== null && p.manche[n];
+  if (!calc || calc.id !== id || calc.n !== n) {
+    calc = {
+      id, n,
+      dettagli: p.squadre.map((_, i) => esistente && esistente.dettagli && esistente.dettagli[i]
+        ? Object.assign(vuotoDettaglio(), JSON.parse(JSON.stringify(esistente.dettagli[i])))
+        : Object.assign(vuotoDettaglio(), esistente ? { manuale: true, totaleManuale: esistente.punti[i] } : {})),
+      aperto: {}
+    };
+  }
+  const numero = n === null ? p.manche.length + 1 : n + 1;
+  const semi = p.regolamento === 'semipulito';
+
+  const schede = p.squadre.map((_, i) => {
+    const d = calc.dettagli[i];
+    const stepper = (campo, titolo, sotto) => `<div class="voce-calc">
+        <div class="descr"><strong>${titolo}</strong><span>${sotto}</span></div>
+        <div class="stepper">
+          <button data-azione="meno" data-i="${i}" data-campo="${campo}" aria-label="Togli un ${titolo.toLowerCase()}">${ICONE.meno}</button>
+          <output id="o-${campo}-${i}" aria-live="polite">${d[campo]}</output>
+          <button data-azione="piu" data-i="${i}" data-campo="${campo}" aria-label="Aggiungi un ${titolo.toLowerCase()}">${ICONE.piu}</button>
+        </div>
+      </div>`;
+    const campoPunti = (campo, titolo, sotto) => `<div class="voce-calc">
+        <div class="descr"><label for="i-${campo}-${i}"><strong>${titolo}</strong></label><span>${sotto}</span></div>
+        <input class="input input-punti num" id="i-${campo}-${i}" data-campo="${campo}" data-i="${i}" inputmode="numeric" value="${d[campo] || ''}" placeholder="0">
+      </div>
+      <button class="link-conta" data-azione="conta" data-i="${i}" data-campo="${campo}" aria-expanded="${!!calc.aperto[campo + i]}">${calc.aperto[campo + i] ? 'Chiudi il conta carte' : 'Conta le carte una per una'}</button>
+      ${calc.aperto[campo + i] ? htmlContaCarte(i, campo) : ''}`;
+
+    const automatico = `
+      ${stepper('puliti', 'Burraco pulito', `+${PUNTI.pulito} ciascuno · senza matte`)}
+      ${semi ? stepper('semipuliti', 'Burraco semipulito', `+${PUNTI.semipulito} ciascuno · matta in fondo alla scala`) : ''}
+      ${stepper('sporchi', 'Burraco sporco', `+${PUNTI.sporco} ciascuno · con una matta`)}
+      ${campoPunti('terra', 'Punti carte a terra', 'Tutte le carte calate, burrachi compresi')}
+      ${campoPunti('mano', 'Punti carte in mano', 'Si sottraggono')}
+      <label class="interruttore"><span class="descr"><strong>Ha chiuso</strong><br><span class="tenue">+${PUNTI.chiusura} punti</span></span>
+        <input type="checkbox" data-campo="chiusura" data-i="${i}" ${d.chiusura ? 'checked' : ''}></label>
+      <label class="interruttore malus"><span class="descr"><strong>Pozzetto non preso</strong><br><span class="tenue">−${PUNTI.pozzetto} punti</span></span>
+        <input type="checkbox" data-campo="pozzetto" data-i="${i}" ${d.pozzetto ? 'checked' : ''}></label>
+      <p class="riepilogo-calc num" id="r-${i}">${riepilogo(d, semi)}</p>`;
+
+    const manuale = `<div class="manuale-box">
+        <label class="campo" for="i-totaleManuale-${i}">Totale della manche</label>
+        <input class="input num" id="i-totaleManuale-${i}" data-campo="totaleManuale" data-i="${i}" inputmode="text" value="${d.totaleManuale || ''}" placeholder="es. 740 oppure -85">
+        <p class="aiuto">Per un punteggio negativo scrivi il segno meno davanti.</p>
+      </div>`;
+
+    return `<section class="carta calc-squadra">
+      <div class="calc-testa"><h2>${esc(nomeSquadra(p, i))}</h2><span class="calc-totale num${puntiDettaglio(d, p.regolamento) < 0 ? ' neg' : ''}" id="t-${i}">${fmt(puntiDettaglio(d, p.regolamento))}</span></div>
+      <div class="segmenti" role="group" aria-label="Modo di inserimento">
+        <button data-azione="modo" data-i="${i}" data-val="auto" aria-pressed="${!d.manuale}">Calcolatrice</button>
+        <button data-azione="modo" data-i="${i}" data-val="manuale" aria-pressed="${d.manuale}">Totale a mano</button>
+      </div>
+      ${d.manuale ? manuale : automatico}
+    </section>`;
+  }).join('');
+
+  $('#vista').innerHTML = testata(`Manche ${numero}`, esc(REGOLAMENTI[p.regolamento]), '#/partita/' + id) + schede
+    + `<p id="errore-manche" class="errore" role="alert"></p>`
+    + (n !== null ? `<button class="btn btn-pericolo btn-largo" data-azione="elimina-manche" data-id="${id}" data-n="${n}" style="margin-bottom:16px">${ICONE.cestino}Elimina questa manche</button>` : '');
+  barraAzione(`<button class="btn btn-primario" data-azione="salva-manche">${ICONE.salva}Salva manche</button>`);
+}
+
+function riepilogo(d, semi) {
+  const parti = [];
+  if (d.puliti) parti.push(`${d.puliti}×${PUNTI.pulito}`);
+  if (semi && d.semipuliti) parti.push(`${d.semipuliti}×${PUNTI.semipulito}`);
+  if (d.sporchi) parti.push(`${d.sporchi}×${PUNTI.sporco}`);
+  if (intero(d.terra)) parti.push(`${intero(d.terra)} a terra`);
+  if (d.chiusura) parti.push(`${PUNTI.chiusura} chiusura`);
+  let s = parti.join(' + ');
+  if (intero(d.mano)) s += `${s ? ' ' : ''}− ${intero(d.mano)} in mano`;
+  if (d.pozzetto) s += `${s ? ' ' : ''}− ${PUNTI.pozzetto} pozzetto`;
+  return s ? 'Conto: ' + s : 'Inserisci burrachi e punti delle carte.';
+}
+
+function htmlContaCarte(i, campo) {
+  const chiave = campo === 'terra' ? 'contaTerra' : 'contaMano';
+  const conta = calc.dettagli[i][chiave] || {};
+  return `<div class="conta-carte">
+    ${CARTE.map(c => `<div class="voce-calc">
+      <div class="descr">${c.carte.map(([v, cl]) => `<span class="mini-carta ${cl}">${v}</span>`).join('')}<span>${c.nome} · ${c.valore} punti</span></div>
+      <div class="stepper">
+        <button data-azione="conta-meno" data-i="${i}" data-campo="${campo}" data-carta="${c.chiave}" aria-label="Togli un ${c.nome}">${ICONE.meno}</button>
+        <output>${conta[c.chiave] || 0}</output>
+        <button data-azione="conta-piu" data-i="${i}" data-campo="${campo}" data-carta="${c.chiave}" aria-label="Aggiungi un ${c.nome}">${ICONE.piu}</button>
+      </div>
+    </div>`).join('')}
+    <div class="azzera"><button class="link-conta" data-azione="conta-azzera" data-i="${i}" data-campo="${campo}">Azzera</button></div>
+  </div>`;
+}
+
+function aggiornaTotaleManche(i) {
+  const p = trovaPartita(calc.id);
+  const d = calc.dettagli[i];
+  const tot = puntiDettaglio(d, p.regolamento);
+  const el = $('#t-' + i);
+  if (el) { el.textContent = fmt(tot); el.classList.toggle('neg', tot < 0); }
+  const r = $('#r-' + i);
+  if (r) r.textContent = riepilogo(d, p.regolamento === 'semipulito');
+}
+
+function salvaManche() {
+  const p = trovaPartita(calc.id);
+  const err = $('#errore-manche');
+  const chiusi = calc.dettagli.filter(d => !d.manuale && d.chiusura).length;
+  if (chiusi > 1) { err.textContent = 'Può chiudere un solo giocatore o una sola coppia per manche.'; return; }
+  const punti = calc.dettagli.map(d => puntiDettaglio(d, p.regolamento));
+  const manche = { punti, dettagli: calc.dettagli.map(d => JSON.parse(JSON.stringify(d))) };
+  const eraFinita = p.finita;
+  if (calc.n === null) p.manche.push(manche); else p.manche[calc.n] = manche;
+  p.aggiornata = Date.now();
+  ricalcolaStato(p);
+  salva();
+  const id = p.id;
+  calc = null;
+  vai('#/partita/' + id);
+  if (p.finita && !eraFinita) annunciaVincitore(p);
+  else avviso('Manche salvata');
+}
+
+function annunciaVincitore(p) {
+  const t = totali(p);
+  const f = $('#finestra');
+  f.innerHTML = `${ICONE.trofeo}<h2>Vince ${esc(nomeSquadra(p, p.vincitore))}!</h2>
+    <p class="num">${fmt(t[p.vincitore])} punti in ${p.manche.length} manche.</p>
+    <div class="azioni">
+      <button class="btn btn-primario" data-azione="chiudi-finestra">Vedi il riepilogo</button>
+      <button class="btn btn-secondario" data-azione="rivincita" data-id="${p.id}">${ICONE.ripeti}Rivincita</button>
+    </div>`;
+  if (f.showModal) f.showModal(); else f.setAttribute('open', '');
+}
+
+function chiudiFinestra() {
+  const f = $('#finestra');
+  if (f.close) f.close(); else f.removeAttribute('open');
+}
+
+/* ---------- Schermata: regole ---------- */
+function vistaRegole() {
+  const semi = dati.regolamento === 'semipulito';
+  const mini = c => c.carte.map(([v, cl]) => `<span class="mini-carta ${cl}">${v}</span>`).join('');
+  $('#vista').innerHTML = testata('Come si contano i punti', 'Leggi il tuo tavolo e fai il conto') + `
+    <section class="carta">
+      <h2>Quale regolamento seguite?</h2>
+      <div class="segmenti" role="group" aria-label="Regolamento">
+        ${Object.entries(REGOLAMENTI).map(([k, v]) => `<button data-azione="regolamento" data-val="${k}" aria-pressed="${dati.regolamento === k}">${v}</button>`).join('')}
+      </div>
+      <p class="aiuto">${semi
+        ? 'Con semipulito: oltre a pulito e sporco esiste il burraco semipulito da 150.'
+        : 'Classico (regolamento FIBUR): esistono solo il burraco pulito e quello sporco.'} Diventa la scelta proposta per le nuove partite.</p>
+    </section>
+
+    <section class="carta">
+      <h2>1. Il valore delle carte</h2>
+      <p>Ogni carta ha un valore. Le carte <strong>calate a terra</strong> si sommano, quelle <strong>rimaste in mano</strong> si sottraggono.</p>
+      <table class="tabella-valori">
+        ${CARTE.map(c => `<tr><td>${mini(c)}<br><span class="tenue">${c.nome}</span></td><td class="num">${c.valore}</td></tr>`).join('')}
+      </table>
+      <p class="tenue" style="margin-top:8px">Il jolly e la pinella sono le <strong>matte</strong>: possono sostituire qualsiasi carta.</p>
+    </section>
+
+    <section class="carta">
+      <h2>2. I burrachi</h2>
+      <p>Un burraco è una combinazione di <strong>almeno 7 carte</strong>. Vale un premio che si aggiunge al valore delle sue carte.</p>
+      <table class="tabella-valori">
+        <tr><td><strong>Burraco pulito</strong><br><span class="tenue">7 o più carte senza nessuna matta. Una pinella al suo posto naturale (A‑2‑3 dello stesso seme) conta come carta normale.</span></td><td class="num premio">+${PUNTI.pulito}</td></tr>
+        ${semi ? `<tr><td><strong>Burraco semipulito</strong><br><span class="tenue">7 carte naturali consecutive già formate, più una matta aggiunta a un’estremità della scala.</span></td><td class="num premio">+${PUNTI.semipulito}</td></tr>` : ''}
+        <tr><td><strong>Burraco sporco</strong><br><span class="tenue">7 o più carte con una matta che sostituisce una carta mancante.</span></td><td class="num premio">+${PUNTI.sporco}</td></tr>
+      </table>
+    </section>
+
+    <section class="carta">
+      <h2>3. Chiusura, pozzetto e carte in mano</h2>
+      <table class="tabella-valori">
+        <tr><td><strong>Chiusura</strong><br><span class="tenue">Chi resta senza carte e chiude la mano.</span></td><td class="num premio">+${PUNTI.chiusura}</td></tr>
+        <tr><td><strong>Pozzetto non preso</strong><br><span class="tenue">Chi a fine mano non ha raccolto il pozzetto.</span></td><td class="num malus-txt">−${PUNTI.pozzetto}</td></tr>
+        <tr><td><strong>Carte rimaste in mano</strong><br><span class="tenue">Si sottrae il valore di ogni carta.</span></td><td class="num malus-txt">− valore</td></tr>
+      </table>
+      <p class="tenue" style="margin-top:8px">Per chiudere bisogna aver preso il pozzetto e avere almeno un burraco a terra.</p>
+    </section>
+
+    <section class="carta">
+      <h2>4. Carte uguali (tris, quattro 7…)</h2>
+      <p>Oltre alle scale dello stesso seme si possono calare <strong>3 o più carte dello stesso valore</strong>, anche di semi diversi.</p>
+      <div class="risposta">
+        <strong>Se metto giù quattro carte uguali, come si contano?</strong><br>
+        Si somma solo il valore delle carte, senza nessun premio.
+        Quattro 7 = 4 × 5 = <strong>20 punti</strong>. Quattro K = 4 × 10 = <strong>40 punti</strong>. Quattro assi = 4 × 15 = <strong>60 punti</strong>.
+      </div>
+      <ul>
+        <li>Puoi continuare ad aggiungere carte dello stesso valore: con <strong>7 carte</strong> diventa un burraco.</li>
+        <li>Sette 7 senza matte = burraco pulito: 7 × 5 + ${PUNTI.pulito} = <strong>${7 * 5 + PUNTI.pulito} punti</strong>.</li>
+        <li>Sei 7 + una matta = burraco sporco: il premio è ${PUNTI.sporco}, più il valore di tutte le carte.</li>
+        <li>In ogni combinazione si può usare <strong>al massimo una matta</strong>.</li>
+        ${semi ? '<li>Nelle carte uguali il 2 è sempre una matta, quindi qui il semipulito non esiste.</li>' : ''}
+      </ul>
+    </section>
+
+    <section class="carta">
+      <h2>5. Il conto di una manche</h2>
+      <div class="esempio"><strong>Formula</strong><br>premi dei burrachi + punti delle carte a terra + chiusura − carte in mano − pozzetto non preso</div>
+      <div class="esempio">
+        <strong>Esempio 1, chi chiude</strong><br>
+        <span class="conto">1 pulito (200) + 1 sporco (100) + 340 di carte a terra + chiusura (100) = <strong>740</strong></span>
+      </div>
+      <div class="esempio">
+        <strong>Esempio 2, chi resta con carte in mano</strong><br>
+        <span class="conto">1 sporco (100) + 210 di carte a terra − 45 di carte in mano = <strong>265</strong></span>
+      </div>
+      <div class="esempio">
+        <strong>Esempio 3, pozzetto non preso</strong><br>
+        <span class="conto">0 burrachi + 0 a terra − 85 in mano − 100 pozzetto = <strong>−185</strong></span>
+      </div>
+      ${semi ? `<div class="esempio"><strong>Esempio 4, con semipulito</strong><br><span class="conto">1 semipulito (150) + 1 pulito (200) + 290 a terra + chiusura (100) = <strong>740</strong></span></div>` : ''}
+    </section>
+
+    <section class="carta">
+      <h2>6. Chi vince</h2>
+      <p>Si giocano più manche e si sommano i punti. Vince chi arriva per primo a <strong>2005 punti</strong> (puoi cambiare il traguardo quando crei la partita). Se a fine manche due giocatori superano il traguardo, vince chi ha il punteggio più alto; in caso di parità si gioca un’altra manche.</p>
+    </section>
+
+    <section class="carta">
+      <h2>Promemoria delle combinazioni</h2>
+      <ul>
+        <li><strong>Scala</strong>: almeno 3 carte consecutive dello stesso seme. L’asso può stare sotto il 2 (A‑2‑3) o sopra il K (Q‑K‑A).</li>
+        <li><strong>Carte uguali</strong>: almeno 3 carte dello stesso valore.</li>
+        <li>Si gioca con 2 mazzi da 52 carte più 4 jolly; a ognuno 11 carte e due pozzetti da 11.</li>
+      </ul>
+    </section>`;
+  barraAzione('');
+}
+
+/* ---------- Gestione dei tocchi ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-azione]');
+  if (!el) return;
+  const a = el.dataset.azione;
+  const i = el.dataset.i !== undefined ? intero(el.dataset.i) : null;
+
+  switch (a) {
+    case 'indietro': calc = null; vai(el.dataset.dest); break;
+    case 'apri': vai('#/partita/' + el.dataset.id); break;
+
+    case 'aggiungi-giocatore':
+      if (bozza.nomi.length < 4) bozza.nomi.push('');
+      vistaNuova();
+      $('#g' + (bozza.nomi.length - 1)).focus();
+      break;
+    case 'togli-giocatore':
+      if (bozza.nomi.length > 2) bozza.nomi.splice(i, 1);
+      if (bozza.compagno >= bozza.nomi.length) bozza.compagno = 1;
+      vistaNuova();
+      break;
+    case 'compagno': bozza.compagno = intero(el.dataset.val); $('#coppie').innerHTML = htmlCoppie(); break;
+    case 'regolamento-bozza': bozza.regolamento = el.dataset.val; vistaNuova(); break;
+    case 'traguardo': {
+      bozza.obiettivo = intero(el.dataset.val);
+      $('#obiettivo').value = bozza.obiettivo;
+      aggiornaTraguardi();
+      break;
+    }
+    case 'cambia-traguardo': {
+      const p = trovaPartita(el.dataset.id);
+      const risposta = prompt('A quanti punti si vince questa partita?', p.obiettivo);
+      if (risposta === null) return;
+      const v = intero(risposta);
+      if (v < 100) { avviso('Il traguardo deve essere di almeno 100 punti'); return; }
+      const eraFinita = p.finita;
+      p.obiettivo = v;
+      p.aggiornata = Date.now();
+      ricalcolaStato(p);
+      salva();
+      vistaPartita(p.id);
+      if (p.finita && !eraFinita) annunciaVincitore(p); else avviso('Ora si vince a ' + fmt(v));
+      break;
+    }
+    case 'crea': creaPartita(); break;
+
+    case 'regolamento': dati.regolamento = el.dataset.val; salva(); vistaRegole(); break;
+
+    case 'nuova-manche': calc = null; vai('#/partita/' + el.dataset.id + '/manche'); break;
+    case 'modifica-manche': calc = null; vai('#/partita/' + el.dataset.id + '/manche/' + el.dataset.n); break;
+    case 'elimina-manche': {
+      const p = trovaPartita(el.dataset.id);
+      if (!confirm('Eliminare questa manche? I totali verranno ricalcolati.')) return;
+      p.manche.splice(intero(el.dataset.n), 1);
+      p.aggiornata = Date.now();
+      ricalcolaStato(p);
+      salva();
+      calc = null;
+      vai('#/partita/' + p.id);
+      avviso('Manche eliminata');
+      break;
+    }
+    case 'elimina-partita':
+      if (!confirm('Eliminare definitivamente questa partita?')) return;
+      dati.partite = dati.partite.filter(p => p.id !== el.dataset.id);
+      salva();
+      vai('#/partite');
+      avviso('Partita eliminata');
+      break;
+    case 'rivincita': {
+      const p = trovaPartita(el.dataset.id);
+      const q = { id: nuovoId(), creata: Date.now(), aggiornata: Date.now(), giocatori: p.giocatori.slice(), squadre: JSON.parse(JSON.stringify(p.squadre)), regolamento: p.regolamento, obiettivo: p.obiettivo, manche: [], finita: false, vincitore: null };
+      dati.partite.push(q);
+      salva();
+      chiudiFinestra();
+      vai('#/partita/' + q.id);
+      break;
+    }
+    case 'chiudi-finestra': chiudiFinestra(); break;
+
+    case 'piu': case 'meno': {
+      const d = calc.dettagli[i];
+      const campo = el.dataset.campo;
+      d[campo] = Math.max(0, d[campo] + (a === 'piu' ? 1 : -1));
+      $(`#o-${campo}-${i}`).textContent = d[campo];
+      aggiornaTotaleManche(i);
+      break;
+    }
+    case 'modo': calc.dettagli[i].manuale = el.dataset.val === 'manuale'; vistaManche(calc.id, calc.n); break;
+    case 'conta': {
+      const k = el.dataset.campo + i;
+      calc.aperto[k] = !calc.aperto[k];
+      const y = window.scrollY;
+      vistaManche(calc.id, calc.n);
+      window.scrollTo(0, y);
+      break;
+    }
+    case 'conta-piu': case 'conta-meno': case 'conta-azzera': {
+      const d = calc.dettagli[i];
+      const campo = el.dataset.campo;
+      const chiave = campo === 'terra' ? 'contaTerra' : 'contaMano';
+      if (a === 'conta-azzera') d[chiave] = {};
+      else {
+        d[chiave] = d[chiave] || {};
+        const c = el.dataset.carta;
+        d[chiave][c] = Math.max(0, (d[chiave][c] || 0) + (a === 'conta-piu' ? 1 : -1));
+      }
+      d[campo] = sommaCarte(d[chiave]);
+      const y = window.scrollY;
+      vistaManche(calc.id, calc.n);
+      window.scrollTo(0, y);
+      break;
+    }
+    case 'salva-manche': salvaManche(); break;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-azione]')) { e.preventDefault(); e.target.click(); }
+});
+
+document.addEventListener('input', e => {
+  const el = e.target;
+  const campo = el.dataset.campo;
+  if (!campo) return;
+  if (campo === 'nome') {
+    bozza.nomi[intero(el.dataset.i)] = el.value;
+    const c = $('#coppie');
+    if (c) c.innerHTML = htmlCoppie();
+  } else if (campo === 'obiettivo') {
+    bozza.obiettivo = el.value;
+    aggiornaTraguardi();
+  } else if (calc && ['terra', 'mano', 'totaleManuale'].includes(campo)) {
+    calc.dettagli[intero(el.dataset.i)][campo] = campo === 'totaleManuale' ? intero(el.value) : Math.max(0, intero(el.value));
+    aggiornaTotaleManche(intero(el.dataset.i));
+  }
+});
+
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (!calc || el.type !== 'checkbox') return;
+  const i = intero(el.dataset.i);
+  const campo = el.dataset.campo;
+  calc.dettagli[i][campo] = el.checked;
+  // può chiudere una sola squadra: spunto la chiusura degli altri
+  if (campo === 'chiusura' && el.checked) {
+    calc.dettagli.forEach((d, j) => {
+      if (j !== i && d.chiusura) {
+        d.chiusura = false;
+        const altro = document.querySelector(`input[data-campo="chiusura"][data-i="${j}"]`);
+        if (altro) altro.checked = false;
+        aggiornaTotaleManche(j);
+      }
+    });
+  }
+  aggiornaTotaleManche(i);
+});
+
+window.addEventListener('hashchange', mostra);
+mostra();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
