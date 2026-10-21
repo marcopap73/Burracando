@@ -2,7 +2,7 @@
    Strategia: risponde subito con la copia salvata e intanto scarica la versione nuova,
    così dopo ogni pubblicazione su GitHub l'app si aggiorna da sola alla riapertura successiva.
    Se cambi l'elenco dei file, aumenta il numero di VERSIONE. */
-const VERSIONE = 'burracando-v1';
+const VERSIONE = 'burracando-v2';
 const FILE_APP = [
   './',
   './index.html',
