@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Burracando</title>
 <meta name="description" content="Segnapunti per il Burraco: regole di conteggio, partite a 2, 3 o 4 giocatori, storico delle manche e totali.">
-<meta name="theme-color" content="#0d4a30">
+<meta name="theme-color" content="#174b36">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -372,6 +372,143 @@
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+
+  /* ---------- Identità visiva: tavolo da burraco, superfici Material ---------- */
+  :root {
+    --felt: #174b36;
+    --felt-alto: #1e5a40;
+    --felt-basso: #103b29;
+    --on-felt: #fffdf7;
+    --on-felt-var: #d9e8dc;
+    --nav: #fffdf8;
+    --nav-ind: #dcebdd;
+    --nav-on: #3d5145;
+    --primary: #17633f;
+    --on-primary: #ffffff;
+    --primary-c: #d5ead8;
+    --on-primary-c: #102e1e;
+    --secondary-c: #e5eee3;
+    --on-secondary-c: #24392b;
+    --oro-c: #f6dda7;
+    --on-oro-c: #30230b;
+    --tertiary: #795400;
+    --tertiary-c: #f6dda7;
+    --on-tertiary-c: #30230b;
+    --error: #a62824;
+    --error-c: #f9ded9;
+    --on-error-c: #3d0b09;
+    --surface: #f4f3ec;
+    --surface-low: #fffefa;
+    --surface-c: #f7f6ef;
+    --surface-high: #efeee6;
+    --surface-highest: #e4e5dc;
+    --on-surface: #1b211c;
+    --on-surface-var: #4b554d;
+    --outline: #707a70;
+    --outline-var: #d3d8ce;
+    --inverse-primary: #17633f;
+    --elev-1: 0 1px 2px rgba(28, 42, 31, .08), 0 4px 14px rgba(28, 42, 31, .045);
+    --elev-3: 0 6px 18px rgba(17, 39, 25, .22), 0 2px 5px rgba(17, 39, 25, .12);
+    color-scheme: light;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: #f4f3ec;
+    background-image: radial-gradient(ellipse at 50% -18rem, #e8eee4 0, #f4f3ec 42rem);
+    background-attachment: fixed;
+  }
+  .app { max-width: 760px; padding-right: 20px; padding-left: 20px; }
+  .topbar {
+    min-height: 76px;
+    margin: 0 -20px 20px;
+    padding: calc(10px + env(safe-area-inset-top)) 12px 12px;
+    color: var(--on-felt);
+    background: linear-gradient(135deg, #174b36, #103c2a);
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 5px 18px rgba(17, 49, 32, .14);
+  }
+  .topbar h1 { font-weight: 600; letter-spacing: -.025em; }
+  .topbar.grande h1 { font-size: 1.875rem; letter-spacing: -.035em; }
+  .topbar .sotto { color: #d9e8dc; }
+  .topbar .logo { filter: drop-shadow(0 2px 3px rgba(0,0,0,.18)); }
+  .topbar .icon-btn:hover { background: rgba(255,255,255,.12); }
+
+  .card {
+    border: 1px solid rgba(63, 80, 63, .09);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--elev-1);
+  }
+  .card h2 { font-weight: 600; letter-spacing: -.015em; }
+  .titolo-sezione { color: #263c2e; font-size: 1.05rem; margin: 26px 4px 12px; }
+  .partita-voce { transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+  .partita-voce:hover { transform: translateY(-1px); border-color: #b9cdbb; box-shadow: 0 5px 18px rgba(28,42,31,.1); }
+  .riga-squadra { min-height: 52px; }
+  .riga-squadra .punti { font-variant-numeric: tabular-nums; }
+
+  .btn { font-weight: 650; }
+  .btn-filled { box-shadow: 0 2px 4px rgba(18, 57, 35, .16); }
+  .btn-tonal { background: #e5eee3; }
+  .fab { background: #f1d58d; color: #30230b; box-shadow: 0 7px 20px rgba(39, 34, 17, .23); }
+  .azione > div { max-width: 760px; padding-right: 20px; padding-left: 20px; }
+
+  .nav {
+    background: rgba(255, 253, 248, .97);
+    border-top: 1px solid #e1e3da;
+    box-shadow: 0 -5px 20px rgba(22, 39, 26, .07);
+    backdrop-filter: blur(16px);
+  }
+  .nav ul { max-width: 760px; }
+  .nav a { min-height: 76px; height: auto; padding: 8px 4px; color: #4b554d; }
+  .nav .ind { width: 58px; height: 32px; }
+  .nav a[aria-current="page"] { color: #174b36; font-weight: 700; }
+  .nav a[aria-current="page"] .ind { background: #dcebdd; }
+  .nav a:focus-visible { outline-color: #17633f; outline-offset: -2px; border-radius: 12px; }
+
+  .chip { border-radius: 999px; }
+  .chip.pieno { background: #e5eee3; }
+  .chip-felt { color: #174b36; border-color: #c6d4c7; background: #edf2e9; }
+  .squadra { border: 1px solid rgba(63, 80, 63, .09); border-radius: 20px; padding: 18px 14px; }
+  .squadra.in-testa { background: #d9ebd8; border-color: #a8c8aa; }
+  .squadra .totale { font-weight: 550; letter-spacing: -.04em; }
+  .progresso { height: 6px; border-radius: 999px; }
+  .progresso span { border-radius: 999px; }
+  .vincitore { border-color: #e4ce91; }
+  .calc-testa { border: 1px solid #dce3d8; border-radius: 20px; }
+  .campo-num, .tf input { border-color: #8a948a; }
+  .campo-num:focus, .tf input:focus { box-shadow: 0 0 0 1px var(--primary); }
+  .stepper button { background: #e5eee3; }
+  dialog { border: 1px solid #dce1d8; }
+  .snackbar { border-radius: 14px; }
+
+  :focus-visible { outline-color: #17633f; }
+  button:disabled { cursor: not-allowed; }
+  @media (max-width: 520px) {
+    .app { padding-right: 14px; padding-left: 14px; }
+    .topbar { margin-right: -14px; margin-left: -14px; padding-right: 8px; padding-left: 8px; }
+    .azione > div { padding-right: 14px; padding-left: 14px; }
+    .card { padding: 18px; }
+    .tabellone[style*="--n:3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tabellone[style*="--n:3"] .squadra:last-child { grid-column: 1 / -1; width: calc(50% - 6px); justify-self: center; }
+    .griglia[style*="--n:3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .griglia[style*="--n:3"] > :last-child { grid-column: 1 / -1; width: calc(50% - 6px); justify-self: center; }
+    .griglia[style*="--n:4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 360px) {
+    .app { padding-right: 10px; padding-left: 10px; }
+    .topbar { margin-right: -10px; margin-left: -10px; }
+    .azione > div { padding-right: 10px; padding-left: 10px; }
+    .card { padding: 16px; }
+    .nav a { font-size: .7rem; }
+    .nav .ind { width: 52px; }
+    .calc-testa { padding-right: 8px; padding-left: 8px; }
+  }
+  @media (prefers-contrast: more) {
+    .card, .squadra, .chip { border-color: var(--outline); }
+    .nav { border-top: 2px solid var(--outline); }
   }
 </style>
 </head>
