@@ -1,8 +1,9 @@
 /* Service worker di Burracando: fa funzionare l'app anche senza internet.
-   Strategia: risponde subito con la copia salvata e intanto scarica la versione nuova,
-   così dopo ogni pubblicazione su GitHub l'app si aggiorna da sola alla riapertura successiva.
+   Strategia: i file dell'app arrivano sempre dalla rete (così si vede subito l'ultima versione
+   pubblicata) e la copia salvata si usa solo senza connessione; librerie e font, che hanno
+   versioni fisse, si prendono dalla copia salvata.
    Se cambi l'elenco dei file, aumenta il numero di VERSIONE. */
-const VERSIONE = 'burracando-v5';
+const VERSIONE = 'burracando-v6';
 const FILE_APP = [
   './',
   './index.html',
@@ -31,16 +32,23 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  if (!ORIGINI_IN_CACHE.includes(new URL(e.request.url).origin)) return;
-  e.respondWith(
-    caches.open(VERSIONE).then(cache =>
-      cache.match(e.request, { ignoreSearch: true }).then(salvata => {
-        const dallaRete = fetch(e.request).then(risposta => {
-          if (risposta && (risposta.ok || risposta.type === 'opaque')) cache.put(e.request, risposta.clone());
-          return risposta;
-        }).catch(() => salvata);
-        return salvata || dallaRete;
-      })
-    )
-  );
+  const url = new URL(e.request.url);
+  if (!ORIGINI_IN_CACHE.includes(url.origin)) return;
+  const salva = risposta => {
+    if (risposta && (risposta.ok || risposta.type === 'opaque')) {
+      const copia = risposta.clone();
+      caches.open(VERSIONE).then(cache => cache.put(e.request, copia));
+    }
+    return risposta;
+  };
+  if (url.origin === self.location.origin) {
+    // "no-cache" chiede sempre al server se il file è cambiato, anche se il browser ne ha una copia recente
+    e.respondWith(
+      fetch(url.href, { cache: 'no-cache', credentials: 'same-origin' })
+        .then(salva)
+        .catch(() => caches.match(e.request, { ignoreSearch: true }))
+    );
+  } else {
+    e.respondWith(caches.match(e.request).then(salvata => salvata || fetch(e.request).then(salva)));
+  }
 });
