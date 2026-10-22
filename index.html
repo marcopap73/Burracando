@@ -422,7 +422,6 @@ const ICO = {
   ripeti: svg('M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'),
   testo: svg('M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z'),
   chat: svg('M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z'),
-  chiave: svg('M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'),
   invia: svg('M2.01 21 23 12 2.01 3 2 10l15 2-15 2z'),
   account: svg('M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20z'),
   occhio: svg('M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z'),
@@ -1050,7 +1049,7 @@ function vistaRegole() {
       ${segmenti('Regolamento', Object.entries(REGOLAMENTI), reg, 'regolamento', '', true)}
       <p class="supporto">${descrizioneRegolamento(reg)} Diventa la scelta proposta per le nuove partite.</p>
     </section>
-    <a class="card chiedi-link" href="#/chiedi">${ICO.chat}<span><strong>Hai un dubbio su una regola?</strong><br><span class="var piccolo">Chiedi al regolamento: risponde Claude citando l’articolo.</span></span></a>`;
+    <a class="card chiedi-link" href="#/chiedi">${ICO.chat}<span><strong>Hai un dubbio su una regola?</strong><br><span class="var piccolo">Chiedi al regolamento: l’assistente risponde citando l’articolo.</span></span></a>`;
 
   const valori = `<section class="card">
       <h2>Il valore delle carte</h2>
@@ -1177,32 +1176,12 @@ function vistaRegole() {
   azione('');
 }
 
-/* ---------- Schermata: chiedi al regolamento (chat con Claude) ---------- */
-// La chiave API resta solo su questo dispositivo e va solo ad api.anthropic.com
-const CHIAVE_API = 'burracando-chiave-api';
-const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.132.0/+esm';
-const MODELLO = 'claude-opus-5-5';
-const ISTRUZIONI = `Sei l'assistente di Burracando, un'app segnapunti per il Burraco. Rispondi in italiano alle domande sui due regolamenti ufficiali FIBUR riportati qui sotto: il Codice di Gara Unico del burraco italiano (gennaio 2018) e il Codice di Gara del Burraco Internazionale (marzo 2018).
-Basati solo su questi testi. Indica sempre il regolamento e l'articolo da cui prendi la risposta (per esempio "Codice italiano, Art. 16"). Se la domanda non dice quale regolamento e la risposta cambia tra italiano e internazionale, spiega in breve entrambe le versioni. Se i testi non rispondono alla domanda, dillo chiaramente invece di indovinare.
-Chi legge sta giocando a carte: usa un tono semplice, frasi brevi e al massimo 150 parole, a meno che non chieda più dettagli. Puoi usare **grassetto** ed elenchi con "- ", niente tabelle né titoli.
-Latency-sensitive; begin your visible answer immediately.`;
+/* ---------- Schermata: chiedi al regolamento ---------- */
+// Le domande vanno alla funzione "chiedi" di Supabase, che usa la chiave Google tenuta segreta sul server.
+// La chat è riservata a chi ha l'account, con un limite di domande al giorno.
+const LIMITE_CHAT = 10;
 
-let chat = { api: [], vista: [], inCorso: false };
-let testiRegolamenti = null;
-
-function leggiChiave() { try { return localStorage.getItem(CHIAVE_API) || ''; } catch (e) { return ''; } }
-function scriviChiave(v) {
-  try { if (v) localStorage.setItem(CHIAVE_API, v); else localStorage.removeItem(CHIAVE_API); }
-  catch (e) { avviso('Non riesco a salvare la chiave sul dispositivo'); }
-}
-
-async function caricaRegolamenti() {
-  if (testiRegolamenti) return testiRegolamenti;
-  const leggi = f => fetch(f).then(r => { if (!r.ok) throw new Error('regolamento non trovato'); return r.text(); });
-  const [italiano, internazionale] = await Promise.all([leggi('regolamento-italiano.md'), leggi('regolamento-internazionale.md')]);
-  testiRegolamenti = { italiano, internazionale };
-  return testiRegolamenti;
-}
+let chat = { vista: [], inCorso: false };
 
 /* Testo semplice → HTML: grassetto ed elenchi, tutto il resto escapato */
 function mdLeggero(t) {
@@ -1232,23 +1211,16 @@ function htmlFumetto(m, k) {
 }
 
 function vistaChiedi() {
-  const chiave = leggiChiave();
-  const azioni = (chat.vista.length ? `<button class="icon-btn" data-azione="chat-nuova" aria-label="Nuova conversazione">${ICO.piu}</button>` : '')
-    + `<button class="icon-btn" data-azione="chat-chiave" aria-label="Chiave API">${ICO.chiave}</button>`;
+  const azioni = chat.vista.length ? `<button class="icon-btn" data-azione="chat-nuova" aria-label="Nuova conversazione">${ICO.piu}</button>` : '';
   let html = testata('Chiedi', 'Domande sul regolamento FIBUR', null, azioni);
 
-  if (!chiave) {
+  if (!utente) {
     html += `<section class="card">
-      <h2>Serve una chiave API</h2>
-      <p>Le risposte le scrive Claude, l’intelligenza artificiale di Anthropic, leggendo i due regolamenti FIBUR (italiano e internazionale). Per usarla serve una tua chiave API:</p>
-      <ol class="passi">
-        <li>Crea un account su <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></li>
-        <li>Aggiungi un po’ di credito (bastano pochi euro)</li>
-        <li>In “API keys” crea una chiave e copiala</li>
-        <li>Incollala qui sotto</li>
-      </ol>
-      <p class="var piccolo">Costo indicativo: la prima domanda circa 15 centesimi, le successive (entro 5 minuti) 1‑3 centesimi. La chiave resta solo su questo telefono e viene inviata soltanto ad Anthropic.</p>
-      <button class="btn btn-filled btn-largo" data-azione="chat-chiave" style="margin-top:16px">${ICO.chiave}Inserisci la chiave</button>
+      <h2>Accedi per fare domande</h2>
+      <p class="var">La chat risponde sui regolamenti FIBUR citando l’articolo. È riservata a chi ha un account: ${LIMITE_CHAT} domande al giorno.</p>
+      ${accountAttivo()
+        ? `<a class="btn btn-filled btn-largo" href="#/account" style="margin-top:16px">${ICO.account}Accedi o crea un account</a>`
+        : '<p class="supporto">Disponibile a breve.</p>'}
     </section>`;
     $('#vista').innerHTML = html;
     azione('');
@@ -1259,7 +1231,7 @@ function vistaChiedi() {
   html += `<div id="chat-lista" class="chat-lista" aria-live="polite" aria-busy="${chat.inCorso}">`
     + (chat.vista.length ? chat.vista.map(htmlFumetto).join('') : `<section class="card">
         <h2>Chiedi pure</h2>
-        <p class="var">Fai una domanda su una regola: Claude risponde citando l’articolo del Codice di Gara. In caso di dubbio fa sempre fede il regolamento.</p>
+        <p class="var">Fai una domanda su una regola: l’assistente risponde citando l’articolo del Codice di Gara. Hai ${LIMITE_CHAT} domande al giorno. In caso di dubbio fa sempre fede il regolamento.</p>
         <div class="chips" style="margin-top:12px">${SUGGERIMENTI.map(s => `<button type="button" data-azione="chat-suggerimento" data-testo="${esc(s)}">${esc(s)}</button>`).join('')}</div>
       </section>`)
     + `</div>`;
@@ -1270,9 +1242,7 @@ function vistaChiedi() {
       <button class="icon-btn invia" type="submit" aria-label="Invia" ${chat.inCorso ? 'disabled' : ''}>${ICO.invia}</button>
     </form>`, true);
   document.body.classList.add('con-chat');
-  const lista = $('#chat-lista');
   if (chat.vista.length) window.scrollTo(0, document.body.scrollHeight);
-  return lista;
 }
 
 function aggiornaUltimoFumetto() {
@@ -1284,88 +1254,79 @@ function aggiornaUltimoFumetto() {
   window.scrollTo(0, document.body.scrollHeight);
 }
 
-async function chiediAClaude(domanda) {
+async function chiediAlRegolamento(domanda) {
   domanda = domanda.trim();
-  if (!domanda || chat.inCorso) return;
+  if (!domanda || chat.inCorso || !supa || !utente) return;
+  // la conversazione fin qui: solo le coppie domanda-risposta andate a buon fine
+  const storia = [];
+  chat.vista.forEach((m, k) => {
+    const dopo = chat.vista[k + 1];
+    if (m.ruolo === 'utente' && dopo && dopo.ruolo === 'assistente' && dopo.testo) storia.push({ ruolo: 'utente', testo: m.testo }, { ruolo: 'assistente', testo: dopo.testo });
+  });
   chat.inCorso = true;
   chat.vista.push({ ruolo: 'utente', testo: domanda }, { ruolo: 'assistente', testo: '' });
-  chat.api.push({ role: 'user', content: domanda });
   if (location.hash === '#/chiedi') vistaChiedi();
   const risposta = chat.vista[chat.vista.length - 1];
-  let Anthropic = null;
   try {
-    ({ default: Anthropic } = await import(SDK_URL));
-    const testi = await caricaRegolamenti();
-    const client = new Anthropic({ apiKey: leggiChiave(), dangerouslyAllowBrowser: true, fetch: (...a) => window.fetch(...a) });
-    const stream = client.beta.messages.stream({
-      model: MODELLO,
-      max_tokens: 16000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
-      output_config: { effort: 'low' },
-      system: [
-        { type: 'text', text: ISTRUZIONI },
-        {
-          type: 'text',
-          text: `<regolamento nome="Codice di Gara Unico - Burraco italiano FIBUR, gennaio 2018">\n${testi.italiano}\n</regolamento>\n\n<regolamento nome="Codice di Gara del Burraco Internazionale FIBUR, marzo 2018">\n${testi.internazionale}\n</regolamento>`,
-          cache_control: { type: 'ephemeral' }
-        }
-      ],
-      messages: chat.api
+    const { data } = await supa.auth.getSession();
+    const r = await fetch(SUPABASE_URL + '/functions/v1/chiedi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (data.session ? data.session.access_token : ''), apikey: SUPABASE_CHIAVE },
+      body: JSON.stringify({ messaggi: [...storia.slice(-18), { ruolo: 'utente', testo: domanda }] })
     });
-    for await (const ev of stream) {
-      if (ev.type === 'content_block_delta' && ev.delta.type === 'text_delta') {
-        risposta.testo += ev.delta.text;
-        aggiornaUltimoFumetto();
-      }
+    if (!r.ok) {
+      const e = await r.json().catch(() => ({}));
+      throw Object.assign(new Error(e.errore || 'http ' + r.status), { codice: e.errore });
     }
-    const msg = await stream.finalMessage();
-    if (msg.stop_reason === 'refusal') {
-      chat.api.pop();
-      risposta.ruolo = 'errore';
-      risposta.testo = 'Claude non può rispondere a questa domanda. Prova a riformularla.';
-    } else {
-      chat.api.push({ role: 'assistant', content: msg.content });
-      if (msg.stop_reason === 'max_tokens') risposta.testo += '\n\n(risposta interrotta)';
-      if (!risposta.testo.trim()) risposta.testo = 'Nessuna risposta, riprova.';
-    }
+    await leggiRisposta(r.body, testo => { risposta.testo += testo; aggiornaUltimoFumetto(); });
+    if (!risposta.testo.trim()) throw Object.assign(new Error('vuota'), { codice: 'vuota' });
   } catch (e) {
-    chat.api.pop();
     risposta.ruolo = 'errore';
-    risposta.testo = messaggioErrore(e, Anthropic);
+    risposta.testo = messaggioChat(e);
   }
   chat.inCorso = false;
   if (location.hash === '#/chiedi') { vistaChiedi(); const t = $('#chat-testo'); if (t) t.focus(); }
 }
 
-function messaggioErrore(e, Anthropic) {
-  if (Anthropic) {
-    if (e instanceof Anthropic.AuthenticationError) return 'La chiave API non è valida. Toccala in alto a destra per correggerla.';
-    if (e instanceof Anthropic.PermissionDeniedError) return 'Questa chiave API non ha il permesso di usare Claude.';
-    if (e instanceof Anthropic.RateLimitError) return 'Troppe domande in poco tempo: aspetta un minuto e riprova.';
-    if (e instanceof Anthropic.BadRequestError) return /credit/i.test(e.message) ? 'Il credito del tuo account Anthropic è finito: ricaricalo su console.anthropic.com.' : 'Richiesta non accettata dal servizio. Riprova con una domanda diversa.';
-    if (e instanceof Anthropic.APIConnectionError) return 'Nessuna connessione: controlla internet e riprova.';
-    if (e instanceof Anthropic.APIError) return e.status === 529 ? 'Il servizio è sovraccarico in questo momento: riprova tra poco.' : `Errore del servizio (${e.status || '?'}): riprova tra poco.`;
+/* La risposta arriva a pezzi (Server-Sent Events di Gemini): si mostra man mano */
+async function leggiRisposta(corpo, suTesto) {
+  const lettore = corpo.getReader();
+  const decodifica = new TextDecoder();
+  let resto = '';
+  const usaRiga = riga => {
+    if (!riga.startsWith('data:')) return;
+    let d;
+    try { d = JSON.parse(riga.slice(5)); } catch (e) { return; }
+    if (d.promptFeedback && d.promptFeedback.blockReason) throw Object.assign(new Error('bloccata'), { codice: 'bloccata' });
+    const parti = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || [];
+    const testo = parti.filter(p => p.text && !p.thought).map(p => p.text).join('');
+    if (testo) suTesto(testo);
+  };
+  for (;;) {
+    const { value, done } = await lettore.read();
+    if (done) break;
+    resto += decodifica.decode(value, { stream: true });
+    const righe = resto.split('\n');
+    resto = righe.pop();
+    righe.forEach(usaRiga);
   }
-  if (/regolamento/.test(e.message)) return 'Non riesco a caricare i regolamenti: controlla la connessione e riprova.';
-  return 'Non riesco a contattare Claude: controlla la connessione e riprova.';
+  if (resto) usaRiga(resto);
 }
 
-async function impostaChiave() {
-  const attuale = leggiChiave();
-  const azioni = [{ testo: 'Annulla', valore: null }];
-  if (attuale) azioni.push({ testo: 'Rimuovi', valore: 'rimuovi' });
-  azioni.push({ testo: 'Salva', valore: 'ok' });
-  const v = await dialogo({
-    titolo: 'Chiave API di Anthropic',
-    testo: 'Si crea su console.anthropic.com, nella sezione API keys. Resta salvata solo su questo telefono.',
-    campo: { etichetta: 'Chiave API', valore: attuale, tipo: 'password', valida: x => /^sk-ant-\S{20,}$/.test(x.trim()) ? '' : 'La chiave deve iniziare con sk-ant- (copiala per intero).' },
-    azioni
-  });
-  if (v === null) return;
-  if (v === 'rimuovi') { scriviChiave(''); avviso('Chiave rimossa'); }
-  else { scriviChiave(v.trim()); avviso('Chiave salvata'); }
-  vistaChiedi();
+function messaggioChat(e) {
+  const testi = {
+    limite: `Hai fatto le ${LIMITE_CHAT} domande di oggi: potrai farne altre domani.`,
+    accesso: 'Devi accedere di nuovo al tuo account.',
+    chiave_mancante: 'La chat non è ancora attiva: manca la chiave del servizio.',
+    google_occupato: 'Il servizio è molto richiesto in questo momento: riprova tra un minuto.',
+    google: 'Il servizio non ha risposto: riprova tra poco.',
+    regolamenti: 'Non riesco a leggere i regolamenti: riprova tra poco.',
+    bloccata: 'Non posso rispondere a questa domanda. Prova a riformularla.',
+    vuota: 'Nessuna risposta, riprova.'
+  };
+  if (testi[e.codice]) return testi[e.codice];
+  if (e instanceof TypeError) return 'Nessuna connessione: controlla internet e riprova.';
+  return 'Qualcosa non ha funzionato: riprova tra poco.';
 }
 
 /* ---------- Account e storico nel cloud (Supabase) ---------- */
@@ -1487,7 +1448,8 @@ function lasciaPartiteAccount() {
 /* Ridisegna la schermata dopo un cambio arrivato da fuori, senza disturbare chi sta scrivendo */
 function aggiornaVistaCorrente() {
   const [sez, , sotto] = location.hash.replace(/^#\/?/, '').split('/');
-  if (sotto === 'manche' || sez === 'nuova' || sez === 'chiedi' || $('#dialogo').open) return;
+  const scrivendo = sez === 'chiedi' && (chat.inCorso || ($('#chat-testo') && $('#chat-testo').value));
+  if (sotto === 'manche' || sez === 'nuova' || scrivendo || $('#dialogo').open) return;
   const y = window.scrollY;
   mostra();
   window.scrollTo(0, y);
@@ -1873,9 +1835,8 @@ document.addEventListener('click', e => {
     }
     case 'salva-manche': salvaManche(); break;
 
-    case 'chat-nuova': if (!chat.inCorso) { chat = { api: [], vista: [], inCorso: false }; vistaChiedi(); } break;
-    case 'chat-chiave': impostaChiave(); break;
-    case 'chat-suggerimento': chiediAClaude(el.dataset.testo); break;
+    case 'chat-nuova': if (!chat.inCorso) { chat = { vista: [], inCorso: false }; vistaChiedi(); } break;
+    case 'chat-suggerimento': chiediAlRegolamento(el.dataset.testo); break;
 
     case 'accedi-google': accediConProvider('google'); break;
     case 'accedi-apple': accediConProvider('apple'); break;
@@ -1910,7 +1871,7 @@ document.addEventListener('submit', e => {
   const t = $('#chat-testo');
   const domanda = t.value;
   t.value = '';
-  chiediAClaude(domanda);
+  chiediAlRegolamento(domanda);
 });
 
 document.addEventListener('keydown', e => {
