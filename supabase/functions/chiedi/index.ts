@@ -7,7 +7,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2.117.3';
 const MODELLO = 'gemini-3.8-flash';
 const LIMITE_GIORNALIERO = 10;
 const SITO = 'https://marcopap73.github.io/Burracando/';
-const ORIGINI = ['https://marcopap73.github.io'];
+const ORIGINI = ['https://burracando.vercel.app', 'https://marcopap73.github.io'];
 const ISTRUZIONI = `Sei l'assistente di Burracando, un'app segnapunti per il Burraco. Rispondi in italiano alle domande sui due regolamenti ufficiali FIBUR riportati qui sotto: il Codice di Gara Unico del burraco italiano (gennaio 2018) e il Codice di Gara del Burraco Internazionale (marzo 2018).
 Basati solo su questi testi. Indica sempre il regolamento e l'articolo da cui prendi la risposta (per esempio "Codice italiano, Art. 16"). Se la domanda non dice quale regolamento e la risposta cambia tra italiano e internazionale, spiega in breve entrambe le versioni. Se i testi non rispondono alla domanda, dillo chiaramente invece di indovinare.
 Chi legge sta giocando a carte: usa un tono semplice, frasi brevi e al massimo 150 parole, a meno che non chieda più dettagli. Puoi usare **grassetto** ed elenchi con "- ", niente tabelle né titoli.`;

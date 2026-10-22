@@ -12,4 +12,4 @@ Segnapunti per il Burraco, in italiano, pensato per il telefono.
 
 App a file singolo (`index.html`), dati salvati sul dispositivo. È una PWA installabile: se aggiungi o rinomini file, aggiorna `FILE_APP` e `VERSIONE` in `sw.js`.
 
-Link: https://marcopap73.github.io/Burracando/
+Link: https://burracando.vercel.app/ (anche su https://marcopap73.github.io/Burracando/)
