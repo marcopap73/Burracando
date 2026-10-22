@@ -232,6 +232,15 @@
   .tabella-manche .modifica { width: 40px; color: var(--on-surface-var); text-align: center; padding-right: 0; }
   .tabella-manche .modifica svg { width: 20px; height: 20px; vertical-align: middle; }
 
+  /* Partita a tempo */
+  .tempo-riga { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tempo-ore { font-size: 3rem; font-weight: 500; line-height: 1.1; letter-spacing: -.01em; padding: 0 10px; margin-left: -10px; border-radius: 12px; }
+  .tempo-ore.quasi { background: var(--oro-c); color: var(--on-oro-c); }
+  .tempo-ore.scaduto { background: var(--error-c); color: var(--on-error-c); }
+  .tempo-smazzata { font-size: 1rem; color: var(--on-surface-var); }
+  .tempo-smazzata strong { color: var(--on-surface); font-size: 1.375rem; }
+  .chip-felt svg { width: 18px; height: 18px; }
+
   .vincitore { text-align: center; background: var(--oro-c); color: var(--on-oro-c); }
   .vincitore svg.trofeo { width: 48px; height: 48px; }
   .vincitore h2 { margin: 8px 0 4px; }
@@ -406,6 +415,9 @@ const REGOLE = {
   classico:       { semipulito: false, speciali: false, nonGiocato: false, serveIlPulito: false }
 };
 const regole = reg => REGOLE[reg] || REGOLE.italiano;
+/* Partite a tempo: minuti del turno per numero di smazzate (Art. 5 dei due codici; la variante casalinga usa l'italiano) */
+const TEMPI = { italiano: { 2: 22, 3: 32, 4: 42 }, internazionale: { 2: 30, 3: 40, 4: 55 } };
+const minutiDaRegolamento = (reg, smazzate) => (TEMPI[reg] || TEMPI.italiano)[smazzate];
 const TESTO = { normale: ['Normale', '100%'], grande: ['Grande', '115%'], enorme: ['Molto grande', '130%'] };
 
 /* ---------- Icone Material ---------- */
@@ -428,6 +440,7 @@ const ICO = {
   occhioNo: svg('M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z'),
   esci: svg('M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z'),
   lucchetto: svg('M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z'),
+  timer: svg('M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61 1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'),
   stella: svg('M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'),
   carte: svg('M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z'),
   logo: '<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="14" width="28" height="40" rx="5" transform="rotate(-14 22 34)" fill="#f1ead9" stroke="#d9b44a" stroke-width="2.5"/><rect x="26" y="10" width="30" height="43" rx="5" transform="rotate(8 41 31)" fill="#fbf7ee" stroke="#d9b44a" stroke-width="2.5"/><text x="41" y="41" transform="rotate(8 41 31)" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="24" fill="#0d4a30">B</text></svg>',
@@ -480,17 +493,26 @@ const iniziale = nome => (nome.trim()[0] || '?').toUpperCase();
 function trovaPartita(id) { return dati.partite.find(p => p.id === id); }
 function nomeSquadra(p, i) { return p.squadre[i].membri.map(m => p.giocatori[m]).join(' e '); }
 function totali(p) { return p.squadre.map((_, i) => p.manche.reduce((s, m) => s + (m.punti[i] || 0), 0)); }
+function esitoBreve(p) { return p.vincitore === null ? 'Pareggio' : 'Vince ' + esc(nomeSquadra(p, p.vincitore)); }
 function avatarSquadra(p, i, grande) {
   return `<span class="avatars" aria-hidden="true">${p.squadre[i].membri.map(m =>
     `<span class="avatar av${m}${grande ? ' grande' : ''}">${esc(iniziale(p.giocatori[m]))}</span>`).join('')}</span>`;
 }
 
 /* La partita finisce quando qualcuno arriva al punteggio per vincere
-   ed è da solo in testa; in caso di parità in testa si gioca un'altra manche. */
+   ed è da solo in testa; in caso di parità in testa si gioca un'altra manche.
+   A tempo invece finisce dopo l'ultima smazzata o dopo la smazzata del time out:
+   vince chi ha più punti, e la parità resta pareggio (vincitore null). */
 function ricalcolaStato(p) {
   const t = totali(p);
   const max = Math.max(...t);
   const primi = t.filter(x => x === max).length;
+  if (p.tempo) {
+    const dopoTimeOut = p.tempo.mancheAlTimeOut != null && p.manche.length > p.tempo.mancheAlTimeOut;
+    p.finita = p.manche.length > 0 && (p.manche.length >= p.tempo.smazzate || dopoTimeOut);
+    p.vincitore = p.finita && primi === 1 ? t.indexOf(max) : null;
+    return;
+  }
   if (max >= p.obiettivo && primi === 1) {
     p.finita = true;
     p.vincitore = t.indexOf(max);
@@ -673,18 +695,20 @@ function vocePartita(p) {
       <span class="nome">${esc(nomeSquadra(p, i))}${testa ? `<span class="sr"> (in testa)</span>` : ''}</span>
       <span class="punti num${t[i] < 0 ? ' malus-txt' : ''}">${fmt(t[i])}</span></div>`;
   }).join('');
-  const stato = p.finita
-    ? `<span class="chip oro">${ICO.trofeo.replace('class="trofeo"', '')}Vince ${esc(nomeSquadra(p, p.vincitore))}</span>`
-    : `<span class="chip pieno">${p.manche.length} manche</span>`;
+  let stato;
+  if (p.finita) stato = `<span class="chip oro">${ICO.trofeo.replace('class="trofeo"', '')}${esitoBreve(p)}</span>`;
+  else if (p.tempo && p.tempo.fine) stato = `<span class="chip pieno">${ICO.timer}<span data-timer="${p.id}">${testoTimer(p)}</span></span>`;
+  else stato = `<span class="chip pieno">${p.manche.length} manche</span>`;
+  const formula = p.tempo ? `a tempo, ${p.tempo.smazzate} smazzate` : `si vince a ${fmt(p.obiettivo)}`;
   return `<button class="card partita-voce" data-azione="apri" data-id="${p.id}">
-    <div class="voce-testa"><span class="piccolo var">${dataBreve(p.creata)} · si vince a ${fmt(p.obiettivo)}</span>${stato}</div>
+    <div class="voce-testa"><span class="piccolo var">${dataBreve(p.creata)} · ${formula}</span>${stato}</div>
     ${righe}
   </button>`;
 }
 
 /* ---------- Schermata: nuova partita ---------- */
 function vistaNuova() {
-  if (!bozza) bozza = { nomi: ['', ''], compagno: 2, regolamento: dati.regolamento, obiettivo: 2005, errore: '' };
+  if (!bozza) bozza = { nomi: ['', ''], compagno: 2, regolamento: dati.regolamento, obiettivo: 2005, errore: '', aTempo: false, smazzate: 3, minuti: minutiDaRegolamento(dati.regolamento, 3), erroreMinuti: '' };
   const n = bozza.nomi.length;
   const campi = bozza.nomi.map((nome, i) => `<div class="tf con-icona">
       <input id="g${i}" data-campo="nome" data-i="${i}" value="${esc(nome)}" autocomplete="off" maxlength="24" enterkeyhint="next">
@@ -707,6 +731,21 @@ function vistaNuova() {
       <a class="btn btn-text" href="#/regole" style="margin-top:4px">Leggi le regole</a>
     </section>
     <section class="card">
+      <label class="interruttore-riga" style="margin-top:0">
+        <span><strong style="font-size:1.375rem;font-weight:500">Partita a tempo</strong><br><span class="var piccolo">Come nei tornei: un numero fisso di smazzate e un tempo che scorre senza fermarsi.</span></span>
+        <input type="checkbox" role="switch" class="switch" id="a-tempo" data-azione-switch="a-tempo" ${bozza.aTempo ? 'checked' : ''}>
+      </label>
+      ${bozza.aTempo ? `
+        <h3 style="margin-top:20px;margin-bottom:8px">Quante smazzate?</h3>
+        ${segmenti('Numero di smazzate', [2, 3, 4].map(s => [s, `${s} smazzate`]), bozza.smazzate, 'smazzate')}
+        <div class="tf" style="margin-top:24px">
+          <input id="minuti" data-campo="minuti" inputmode="numeric" value="${esc(bozza.minuti)}" aria-describedby="minuti-aiuto">
+          <label for="minuti">Minuti di gioco</label>
+        </div>
+        <p class="supporto${bozza.erroreMinuti ? ' errore' : ''}" id="minuti-aiuto" ${bozza.erroreMinuti ? 'role="alert"' : ''}>${bozza.erroreMinuti ? esc(bozza.erroreMinuti) : esc(testoTempiRegolamento(bozza.regolamento))}</p>
+        <p class="var piccolo" style="margin-top:12px">Vince chi ha più punti alla fine dell’ultima smazzata. Allo scadere del tempo l’app vi dice come finire.</p>` : ''}
+    </section>
+    ${bozza.aTempo ? '' : `<section class="card">
       <h2>A quanti punti si vince?</h2>
       <div class="chips" id="traguardi" role="group" aria-label="Traguardi rapidi">${htmlTraguardi()}</div>
       <div class="tf" style="margin-top:20px">
@@ -714,7 +753,7 @@ function vistaNuova() {
         <label for="obiettivo">Traguardo personalizzato</label>
       </div>
       <p class="supporto${bozza.errore ? ' errore' : ''}" id="obiettivo-aiuto" ${bozza.errore ? 'role="alert"' : ''}>${bozza.errore ? esc(bozza.errore) : 'Da regolamento si gioca a 2005. Potrai cambiarlo anche a partita iniziata.'}</p>
-    </section>`;
+    </section>`}`;
   azione(`<button class="btn fab" data-azione="crea">${ICO.check}Inizia la partita</button>`, true);
 }
 
@@ -738,9 +777,21 @@ function htmlCoppie() {
     <p class="supporto">Coppie: <strong>${nome(0)} e ${nome(bozza.compagno)}</strong> contro <strong>${[1, 2, 3].filter(i => i !== bozza.compagno).map(nome).join(' e ')}</strong></p>`;
 }
 
+function testoTempiRegolamento(reg) {
+  const t = TEMPI[reg] || TEMPI.italiano;
+  return `Da regolamento${reg === 'internazionale' ? ' internazionale' : ''}: ${Object.entries(t).map(([s, m]) => `${s} smazzate ${m} minuti`).join(', ')} (Art. 5).`;
+}
+
 function creaPartita() {
   const nomi = bozza.nomi.map((s, i) => s.trim() || `Giocatore ${i + 1}`);
-  const obiettivo = intero(bozza.obiettivo);
+  const obiettivo = bozza.aTempo ? 2005 : intero(bozza.obiettivo);
+  const minuti = intero(bozza.minuti);
+  if (bozza.aTempo && (minuti < 1 || minuti > 300)) {
+    bozza.erroreMinuti = 'Scrivi un tempo tra 1 e 300 minuti.';
+    vistaNuova();
+    $('#minuti').focus();
+    return;
+  }
   if (obiettivo < 100) {
     bozza.errore = 'Scrivi un traguardo di almeno 100 punti.';
     vistaNuova();
@@ -751,6 +802,7 @@ function creaPartita() {
   if (nomi.length === 4) squadre = [{ membri: [0, bozza.compagno] }, { membri: [1, 2, 3].filter(i => i !== bozza.compagno) }];
   else squadre = nomi.map((_, i) => ({ membri: [i] }));
   const p = { id: nuovoId(), creata: Date.now(), aggiornata: Date.now(), giocatori: nomi, squadre, regolamento: bozza.regolamento, obiettivo, manche: [], finita: false, vincitore: null };
+  if (bozza.aTempo) p.tempo = nuovoTempo(bozza.smazzate, minuti);
   if (utente) p.utente = utente.id;
   dati.partite.push(p);
   salva();
@@ -766,7 +818,7 @@ function vistaPartita(id) {
   const titolo = p.squadre.map((_, i) => esc(nomeSquadra(p, i))).join(' vs ');
 
   const tabellone = `<div class="tabellone" style="--n:${p.squadre.length}">${p.squadre.map((_, i) => {
-    const inTesta = p.manche.length && t[i] === max;
+    const inTesta = p.manche.length && t[i] === max && !(p.finita && p.vincitore === null);
     const perc = Math.max(0, Math.min(100, t[i] / p.obiettivo * 100));
     const manca = p.obiettivo - t[i];
     let stato = '';
@@ -777,20 +829,22 @@ function vistaPartita(id) {
       <div class="nome">${esc(nomeSquadra(p, i))}</div>
       <div class="totale num${t[i] < 0 ? ' neg' : ''}">${fmt(t[i])}</div>
       <div class="stato">${stato}</div>
-      <div class="progresso" role="progressbar" aria-label="Avanzamento di ${esc(nomeSquadra(p, i))}" aria-valuemin="0" aria-valuemax="${p.obiettivo}" aria-valuenow="${Math.max(0, t[i])}"><span style="width:${perc}%"></span></div>
-      <div class="manca">${manca > 0 ? `mancano ${fmt(manca)}` : 'traguardo raggiunto'}</div>
+      ${p.tempo ? '' : `<div class="progresso" role="progressbar" aria-label="Avanzamento di ${esc(nomeSquadra(p, i))}" aria-valuemin="0" aria-valuemax="${p.obiettivo}" aria-valuenow="${Math.max(0, t[i])}"><span style="width:${perc}%"></span></div>
+      <div class="manca">${manca > 0 ? `mancano ${fmt(manca)}` : 'traguardo raggiunto'}</div>`}
     </div>`;
   }).join('')}</div>`;
 
   const info = `<div class="info-partita">
     <span class="chip chip-felt">${REGOLAMENTI[p.regolamento]}</span>
-    <button class="chip chip-felt" data-azione="cambia-traguardo" data-id="${p.id}" aria-label="Si vince a ${fmt(p.obiettivo)}. Cambia traguardo">${ICO.matita}Si vince a ${fmt(p.obiettivo)}</button>
+    ${p.tempo
+      ? `<span class="chip chip-felt">${ICO.timer}${p.tempo.smazzate} smazzate in ${p.tempo.minuti} minuti</span>`
+      : `<button class="chip chip-felt" data-azione="cambia-traguardo" data-id="${p.id}" aria-label="Si vince a ${fmt(p.obiettivo)}. Cambia traguardo">${ICO.matita}Si vince a ${fmt(p.obiettivo)}</button>`}
   </div>`;
 
   const vincitore = p.finita ? `<section class="card vincitore" style="margin-top:16px">
       ${ICO.trofeo}
-      <h2>Vince ${esc(nomeSquadra(p, p.vincitore))}</h2>
-      <p class="num">con ${fmt(t[p.vincitore])} punti in ${p.manche.length} manche</p>
+      <h2>${esitoBreve(p)}</h2>
+      <p class="num">${p.vincitore === null ? `${fmt(max)} punti a testa` : `con ${fmt(t[p.vincitore])} punti`} in ${p.manche.length} manche</p>
       <button class="btn" data-azione="rivincita" data-id="${p.id}">${ICO.ripeti}Rivincita, stessi giocatori</button>
     </section>` : '';
 
@@ -812,10 +866,157 @@ function vistaPartita(id) {
 
   $('#vista').innerHTML = testata(titolo, `${p.manche.length} manche · ${dataBreve(p.creata)}`, '#/partite',
     `<button class="icon-btn" data-azione="elimina-partita" data-id="${p.id}" aria-label="Elimina partita">${ICO.cestino}</button>`)
-    + tabellone + info + vincitore
+    + tabellone + info + htmlTempo(p) + vincitore
     + `<h2 class="titolo-sezione">Manche</h2>` + storico;
 
-  azione(p.finita ? '' : `<button class="btn fab" data-azione="nuova-manche" data-id="${p.id}">${ICO.piu}Aggiungi manche ${p.manche.length + 1}</button>`);
+  const dellUltima = p.tempo ? ` di ${p.tempo.smazzate}` : '';
+  azione(p.finita ? '' : `<button class="btn fab" data-azione="nuova-manche" data-id="${p.id}">${ICO.piu}Aggiungi manche ${p.manche.length + 1}${dellUltima}</button>`);
+}
+
+/* ---------- Partite a tempo ---------- */
+// "fine" è l'ora di scadenza (null finché non si avvia): così il tempo scorre anche ad app chiusa
+// e su ogni dispositivo dell'account. "mancheAlTimeOut" è quante manche c'erano allo scadere.
+function nuovoTempo(smazzate, minuti) {
+  return { smazzate, minuti, fine: null, mancheAlTimeOut: null };
+}
+
+function testoTimer(p, ora = Date.now()) {
+  if (!p.tempo.fine) return `${p.tempo.minuti}:00`;
+  const resto = Math.max(0, Math.ceil((p.tempo.fine - ora) / 1000));
+  if (!resto) return 'Time out';
+  return `${Math.floor(resto / 60)}:${String(resto % 60).padStart(2, '0')}`;
+}
+
+function classeTimer(p, ora = Date.now()) {
+  if (!p.tempo.fine) return '';
+  const resto = p.tempo.fine - ora;
+  return resto <= 0 ? 'scaduto' : resto <= 5 * 60000 ? 'quasi' : '';
+}
+
+function htmlTempo(p) {
+  if (!p.tempo || p.finita) return '';
+  const T = p.tempo;
+  const smazzata = Math.min(p.manche.length + 1, T.smazzate);
+  let sotto;
+  if (!T.fine) sotto = `<p class="var piccolo">Avvialo quando il mazziere scopre la prima carta del tallone. Poi non si ferma più, neanche tra una smazzata e l’altra.</p>
+      <button class="btn btn-filled btn-largo" data-azione="avvia-tempo" data-id="${p.id}" style="margin-top:12px">${ICO.timer}Avvia il tempo</button>`;
+  else if (T.mancheAlTimeOut != null) sotto = `<p><strong>Tempo scaduto:</strong> finite questa smazzata e segnate i punti. È l’ultima.</p>
+      <button class="btn btn-text" data-azione="cosa-fare" data-id="${p.id}" style="margin-top:4px">Cosa fare al time out</button>`;
+  else sotto = `<p class="var piccolo">Il tempo scorre anche se chiudi l’app. Allo scadere suona e vi dice come finire.</p>`;
+  return `<section class="card tempo" style="margin-top:16px">
+      <div class="tempo-riga">
+        <span class="tempo-ore num ${classeTimer(p)}" role="timer" aria-label="Tempo rimasto" data-timer="${p.id}">${testoTimer(p)}</span>
+        <span class="tempo-smazzata">Smazzata <strong>${smazzata}</strong> di ${T.smazzate}</span>
+      </div>
+      ${sotto}
+    </section>`;
+}
+
+function avviaTempo(id) {
+  const p = trovaPartita(id);
+  if (!p || !p.tempo || p.tempo.fine) return;
+  sbloccaSuono();
+  p.tempo.fine = Date.now() + p.tempo.minuti * 60000;
+  p.aggiornata = Date.now();
+  salva();
+  vistaPartita(id);
+  tieniSchermoAcceso();
+  avviso(`Tempo avviato: ${p.tempo.minuti} minuti`);
+}
+
+/* Istruzioni sintetiche per il time out, dall'Art. 15 del codice scelto */
+function istruzioniTimeOut(p) {
+  const coppie = p.squadre.some(s => s.membri.length === 2);
+  const finale = `<li><strong>Poi segnate i punti</strong> con “Aggiungi manche”: è l’ultima smazzata, vince chi ha più punti.</li>`;
+  if (p.regolamento === 'internazionale') {
+    return `<ol class="passi">
+        <li><strong>Ultimo giro:</strong> ${coppie ? 'si fa un giro completo che parte dal compagno di chi deve pescare' : 'ognuno gioca ancora un turno, a partire da chi deve pescare'}. Se si stavano dando le carte, si gioca un giro completo.</li>
+        <li><strong>Se nessuno chiude</strong> in questo giro, nessuno prende i 100 punti di chiusura.</li>
+        ${finale}
+      </ol><span class="fonte">Internazionale · Art. 15</span>`;
+  }
+  return `<ol class="passi">
+      <li><strong>Ultimo giro:</strong> si gioca fino allo scarto di chi ha dato le carte, poi un altro giro completo che finisce di nuovo con il suo scarto. Se si stavano dando le carte, si gioca un giro completo.</li>
+      <li><strong>Se nessuno chiude:</strong> niente 100 punti di chiusura, e chi non ha preso il pozzetto ha −100.</li>
+      ${finale}
+    </ol><span class="fonte">${p.regolamento === 'classico' ? 'Come nel codice italiano' : 'Codice italiano'} · Art. 15</span>`;
+}
+
+function mostraCosaFare(p, scaduto) {
+  return dialogo({
+    icona: ICO.timer,
+    titolo: scaduto ? 'Time out!' : 'Cosa fare al time out',
+    html: istruzioniTimeOut(p),
+    azioni: [{ testo: 'Ho capito', valore: 'ok' }]
+  });
+}
+
+async function timeOut(p) {
+  p.tempo.mancheAlTimeOut = p.manche.length;
+  p.aggiornata = Date.now();
+  salva();
+  suonaTimeOut();
+  const [sez, id, sotto] = location.hash.replace(/^#\/?/, '').split('/');
+  if (sez === 'partita' && id === p.id && !sotto) vistaPartita(p.id);
+  else if (sez === 'partite' || !sez) vistaPartite();
+  tieniSchermoAcceso();
+  await mostraCosaFare(p, true);
+}
+
+// ogni secondo: aggiorna i cronometri visibili e controlla se qualche tempo è scaduto
+function controllaTempi() {
+  const ora = Date.now();
+  document.querySelectorAll('[data-timer]').forEach(el => {
+    const p = trovaPartita(el.dataset.timer);
+    if (!p || !p.tempo) return;
+    el.textContent = testoTimer(p, ora);
+    if (el.classList.contains('tempo-ore')) el.className = `tempo-ore num ${classeTimer(p, ora)}`;
+  });
+  if ($('#dialogo').open) return;
+  const scaduta = dati.partite.find(p => p.tempo && p.tempo.fine && !p.finita && p.tempo.mancheAlTimeOut == null && ora >= p.tempo.fine);
+  if (scaduta) timeOut(scaduta);
+}
+
+/* Suono e vibrazione al time out. Il browser fa suonare solo dopo un tocco: l'audio si prepara su "Avvia il tempo". */
+let audio = null;
+function sbloccaSuono() {
+  try {
+    if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === 'suspended') audio.resume();
+  } catch (e) { audio = null; }
+}
+function suonaTimeOut() {
+  if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 600]);
+  if (!audio) return;
+  try {
+    if (audio.state === 'suspended') audio.resume();
+    [0, 0.5, 1].forEach(t => {
+      const o = audio.createOscillator();
+      const g = audio.createGain();
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, audio.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.4, audio.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + t + 0.35);
+      o.connect(g).connect(audio.destination);
+      o.start(audio.currentTime + t);
+      o.stop(audio.currentTime + t + 0.4);
+    });
+  } catch (e) { /* senza audio resta la vibrazione */ }
+}
+
+/* Con un tempo in corso lo schermo resta acceso, così l'avviso arriva puntuale */
+let bloccoSchermo = null;
+async function tieniSchermoAcceso() {
+  const inCorso = dati.partite.some(p => p.tempo && p.tempo.fine && !p.finita && p.tempo.mancheAlTimeOut == null);
+  try {
+    if (inCorso && !bloccoSchermo && 'wakeLock' in navigator && document.visibilityState === 'visible') {
+      bloccoSchermo = await navigator.wakeLock.request('screen');
+      bloccoSchermo.addEventListener('release', () => { bloccoSchermo = null; });
+    } else if (!inCorso && bloccoSchermo) {
+      await bloccoSchermo.release();
+      bloccoSchermo = null;
+    }
+  } catch (e) { bloccoSchermo = null; }
 }
 
 /* ---------- Schermata: calcolatrice della manche ---------- */
@@ -896,7 +1097,9 @@ function vistaManche(id, n) {
         <div class="voce">${colonne((i, d) => `<p class="riepilogo num" id="r-${i}">${riepilogo(d, p.regolamento)}</p>`)}</div>
       </section>`;
 
-  $('#vista').innerHTML = testata(`Manche ${numero}`, esc(REGOLAMENTI[p.regolamento]), '#/partita/' + id,
+  const sottotitolo = esc(REGOLAMENTI[p.regolamento])
+    + (p.tempo && p.tempo.fine && !p.finita ? ` · <span role="timer" aria-label="Tempo rimasto" data-timer="${p.id}">${testoTimer(p)}</span>` : '');
+  $('#vista').innerHTML = testata(`Manche ${numero}`, sottotitolo, '#/partita/' + id,
       n !== null ? `<button class="icon-btn" data-azione="elimina-manche" data-id="${id}" data-n="${n}" aria-label="Elimina questa manche">${ICO.cestino}</button>` : '')
     + `<div class="calc-testa">${testaCol}<div style="margin-top:12px">${segmenti('Modo di inserimento', [['auto', 'Calcolatrice'], ['manuale', 'Solo i totali']], manuale ? 'manuale' : 'auto', 'modo')}</div></div>`
     + corpo
@@ -978,6 +1181,7 @@ function salvaManche() {
   salva();
   calc = null;
   vai('#/partita/' + p.id);
+  tieniSchermoAcceso();
   if (p.finita && !eraFinita) annunciaVincitore(p);
   else avviso('Manche salvata');
 }
@@ -986,8 +1190,8 @@ async function annunciaVincitore(p) {
   const t = totali(p);
   const r = await dialogo({
     icona: ICO.trofeo,
-    titolo: `Vince ${esc(nomeSquadra(p, p.vincitore))}!`,
-    testo: `${fmt(t[p.vincitore])} punti in ${p.manche.length} manche.`,
+    titolo: `${esitoBreve(p)}!`,
+    testo: p.vincitore === null ? `${fmt(Math.max(...t))} punti a testa in ${p.manche.length} manche.` : `${fmt(t[p.vincitore])} punti in ${p.manche.length} manche.`,
     azioni: [{ testo: 'Rivincita', valore: 'rivincita' }, { testo: 'Vedi il riepilogo', valore: 'ok' }]
   });
   if (r === 'rivincita') rivincita(p.id);
@@ -996,6 +1200,7 @@ async function annunciaVincitore(p) {
 function rivincita(id) {
   const p = trovaPartita(id);
   const q = { id: nuovoId(), creata: Date.now(), aggiornata: Date.now(), giocatori: p.giocatori.slice(), squadre: JSON.parse(JSON.stringify(p.squadre)), regolamento: p.regolamento, obiettivo: p.obiettivo, manche: [], finita: false, vincitore: null };
+  if (p.tempo) q.tempo = nuovoTempo(p.tempo.smazzate, p.tempo.minuti);
   if (utente) q.utente = utente.id;
   dati.partite.push(q);
   salva();
@@ -1104,7 +1309,8 @@ function vistaRegole() {
     <section class="card">
       <h2>Tempi nei tornei</h2>
       <p>Le smazzate sono un po’ più lunghe dell’italiano: 30 minuti per 2 smazzate, 40 per 3, 55 per 4. La differenza di punti tra le coppie si converte in Victory Points con le tabelle dello score.</p>
-      ${art('5 e 17', 'Internazionale')}
+      <p><strong>Time out:</strong> allo scadere si fa un ultimo giro completo, che parte dal compagno di chi deve pescare. Se nessuno chiude, niente 100 punti di chiusura. Puoi giocare a tempo scegliendo “Partita a tempo” quando crei la partita.</p>
+      ${art('5, 15 e 17', 'Internazionale')}
     </section>`;
   } else {
     corpo = `
@@ -1160,6 +1366,13 @@ function vistaRegole() {
     <section class="card">
       <h2>Chi vince</h2>
       <p>Si sommano i punti delle manche. Vince chi arriva per primo al traguardo: di solito <strong>2005 punti</strong>, ma puoi sceglierne un altro quando crei la partita o anche dopo. Se in una manche due giocatori superano il traguardo vince il punteggio più alto; in caso di parità si gioca un’altra manche. Nei tornei si gioca un numero fisso di smazzate e la differenza diventa Victory Points.</p>
+    </section>
+    <section class="card">
+      <h2>Partite a tempo</h2>
+      <p>Nei tornei ogni turno ha un tempo fisso: <strong>22 minuti per 2 smazzate, 32 per 3, 42 per 4</strong>. Il tempo non si ferma tra una smazzata e l’altra.</p>
+      <p><strong>Time out:</strong> si gioca fino allo scarto di chi ha dato le carte, poi un altro giro completo. Se nessuno chiude, niente 100 punti di chiusura e chi non ha preso il pozzetto ha −100.</p>
+      <p>Per giocare così scegli “Partita a tempo” quando crei la partita: vince chi ha più punti alla fine.</p>
+      ${art('5 e 15', 'Codice italiano')}
     </section>
     <section class="card">
       <h2>Promemoria</h2>
@@ -1543,7 +1756,7 @@ function rigaPartita(p, mio) {
     totali: totali(p),
     num_manche: p.manche.length,
     finita: !!p.finita,
-    vincitore: p.finita ? nomeSquadra(p, p.vincitore) : null,
+    vincitore: !p.finita ? null : p.vincitore === null ? 'Pareggio' : nomeSquadra(p, p.vincitore),
     dati: partita
   };
 }
@@ -1766,7 +1979,20 @@ document.addEventListener('click', e => {
       vistaNuova();
       break;
     case 'compagno': bozza.compagno = intero(el.dataset.val); $('#coppie').innerHTML = htmlCoppie(); break;
-    case 'regolamento-bozza': bozza.regolamento = el.dataset.val; vistaNuova(); break;
+    case 'regolamento-bozza':
+      bozza.regolamento = el.dataset.val;
+      bozza.minuti = minutiDaRegolamento(bozza.regolamento, bozza.smazzate);
+      vistaNuova();
+      break;
+    case 'smazzate':
+      bozza.smazzate = intero(el.dataset.val);
+      bozza.minuti = minutiDaRegolamento(bozza.regolamento, bozza.smazzate);
+      bozza.erroreMinuti = '';
+      vistaNuova();
+      document.querySelector(`[data-azione="smazzate"][data-val="${bozza.smazzate}"]`).focus();
+      break;
+    case 'avvia-tempo': avviaTempo(el.dataset.id); break;
+    case 'cosa-fare': mostraCosaFare(trovaPartita(el.dataset.id), false); break;
     case 'traguardo':
       bozza.obiettivo = intero(el.dataset.val);
       $('#obiettivo').value = bozza.obiettivo;
@@ -1892,6 +2118,8 @@ document.addEventListener('input', e => {
   } else if (campo === 'obiettivo') {
     bozza.obiettivo = el.value;
     $('#traguardi').innerHTML = htmlTraguardi();
+  } else if (campo === 'minuti') {
+    bozza.minuti = el.value;
   } else if (calc && ['terra', 'mano', 'nonGiocato', 'totaleManuale', 'puliti', 'semipuliti', 'sporchi', 'superb', 'reali'].includes(campo)) {
     calc.dettagli[intero(el.dataset.i)][campo] = campo === 'totaleManuale' ? intero(el.value) : Math.max(0, intero(el.value));
     aggiornaTotaleManche(intero(el.dataset.i));
@@ -1901,6 +2129,7 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   const el = e.target;
   if (el.dataset.azioneSwitch === 'ricordami') { impostaRicordami(el.checked); return; }
+  if (el.dataset.azioneSwitch === 'a-tempo') { bozza.aTempo = el.checked; vistaNuova(); $('#a-tempo').focus(); return; }
   if (!calc || el.type !== 'checkbox') return;
   const i = intero(el.dataset.i);
   const campo = el.dataset.campo;
@@ -1942,7 +2171,15 @@ window.addEventListener('hashchange', mostra);
 mostra();
 avviaAccount();
 window.addEventListener('online', () => sincronizza());
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sincronizza(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  sincronizza();
+  controllaTempi();
+  tieniSchermoAcceso();
+});
+setInterval(controllaTempi, 1000);
+controllaTempi();
+tieniSchermoAcceso();
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
