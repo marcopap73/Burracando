@@ -90,7 +90,7 @@
   .topbar .sotto { font-size: .875rem; color: var(--on-felt-var); }
   .topbar.grande h1 { font-size: 1.75rem; font-weight: 600; }
   .topbar .logo { width: 48px; height: 48px; margin-left: 8px; }
-  .icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; color: inherit; position: relative; flex: none; }
+  .icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; color: inherit; position: relative; flex: none; text-decoration: none; }
   .icon-btn svg { width: 24px; height: 24px; }
   .icon-btn:hover { background: rgba(255,255,255,.08); }
   .icon-btn:active { background: rgba(255,255,255,.14); }
@@ -345,6 +345,22 @@
   .chat-input .invia:disabled { opacity: .38; }
   body.con-chat .app { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
 
+  /* Account */
+  .avatar.piccolo { width: 32px; height: 32px; font-size: .875rem; border: 0; }
+  .btn-social { gap: 12px; }
+  .btn-social + .btn-social { margin-top: 12px; }
+  .btn-social svg { width: 20px; height: 20px; }
+  .btn-social.google { background: #fff; color: #1f1f1f; border: 1px solid #747775; }
+  .btn-social.apple { background: #000; color: #fff; }
+  .interruttore-riga { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; cursor: pointer; }
+  .profilo { display: flex; align-items: center; gap: 16px; }
+  .profilo > div { min-width: 0; }
+  .profilo h2 { margin-bottom: 2px; overflow-wrap: anywhere; }
+  .profilo .chip { margin-top: 8px; }
+  .link-accesso { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin-top: 12px; }
+  .supporto.ok { color: var(--primary); font-weight: 600; }
+  .btn:disabled { opacity: .6; cursor: default; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
   }
@@ -408,6 +424,11 @@ const ICO = {
   chat: svg('M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z'),
   chiave: svg('M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'),
   invia: svg('M2.01 21 23 12 2.01 3 2 10l15 2-15 2z'),
+  account: svg('M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20z'),
+  occhio: svg('M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z'),
+  occhioNo: svg('M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z'),
+  esci: svg('M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z'),
+  lucchetto: svg('M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z'),
   stella: svg('M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'),
   carte: svg('M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z'),
   logo: '<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="14" width="28" height="40" rx="5" transform="rotate(-14 22 34)" fill="#f1ead9" stroke="#d9b44a" stroke-width="2.5"/><rect x="26" y="10" width="30" height="43" rx="5" transform="rotate(8 41 31)" fill="#fbf7ee" stroke="#d9b44a" stroke-width="2.5"/><text x="41" y="41" transform="rotate(8 41 31)" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="24" fill="#0d4a30">B</text></svg>',
@@ -427,14 +448,19 @@ function carica() {
         // le prime versioni chiamavano "semipulito" quello che è il regolamento italiano FIBUR
         if (d.regolamento === 'semipulito') d.regolamento = 'italiano';
         d.partite.forEach(p => { if (p.regolamento === 'semipulito') p.regolamento = 'italiano'; });
-        return Object.assign({ regolamento: 'italiano', testo: 'normale' }, d);
+        return Object.assign({ regolamento: 'italiano', testo: 'normale', cancellate: [] }, d);
       }
     }
   } catch (e) { /* memoria non disponibile: si parte vuoti */ }
-  return { partite: [], regolamento: 'italiano', testo: 'normale' };
+  return { partite: [], regolamento: 'italiano', testo: 'normale', cancellate: [] };
 }
 
 function salva() {
+  scriviLocale();
+  programmaSincronizzazione();
+}
+
+function scriviLocale() {
   try { localStorage.setItem(CHIAVE, JSON.stringify(dati)); }
   catch (e) { avviso('Attenzione: non riesco a salvare sul dispositivo'); }
 }
@@ -513,7 +539,13 @@ function conAnnulla(testo, modifica) {
   const prima = JSON.stringify(dati);
   modifica();
   salva();
-  avviso(testo, { testo: 'Annulla', fn: () => { dati = JSON.parse(prima); salva(); mostra(); avviso('Ripristinato'); } });
+  avviso(testo, { testo: 'Annulla', fn: () => {
+    const attuali = new Map(dati.partite.map(p => [p.id, JSON.stringify(p)]));
+    dati = JSON.parse(prima);
+    // le partite ripristinate contano come modificate adesso: così il ripristino vince anche nel cloud
+    dati.partite.forEach(p => { if (attuali.get(p.id) !== JSON.stringify(p)) p.aggiornata = Date.now(); });
+    salva(); mostra(); avviso('Ripristinato');
+  } });
 }
 
 /* Finestra di dialogo Material: restituisce il valore del pulsante scelto,
@@ -525,7 +557,7 @@ function dialogo({ titolo, testo = '', icona = '', html = '', campo = null, azio
       <h2 id="dlg-titolo">${titolo}</h2>
       ${testo ? `<p>${testo}</p>` : ''}
       ${html}
-      ${campo ? `<div class="tf" style="margin-top:20px"><input id="dlg-in" type="${campo.tipo || 'text'}" autocomplete="off" inputmode="${campo.inputmode || 'text'}" value="${esc(campo.valore)}" aria-describedby="dlg-err"><label for="dlg-in">${campo.etichetta}</label></div><p class="supporto errore" id="dlg-err" aria-live="assertive"></p>` : ''}
+      ${campo ? `<div class="tf" style="margin-top:20px"><input id="dlg-in" type="${campo.tipo || 'text'}" autocomplete="${campo.autocomplete || 'off'}" inputmode="${campo.inputmode || 'text'}" value="${esc(campo.valore)}" aria-describedby="dlg-err"><label for="dlg-in">${campo.etichetta}</label></div><p class="supporto errore" id="dlg-err" aria-live="assertive"></p>` : ''}
       <div class="dlg-azioni">${azioni.map((a, k) => `<button type="button" class="btn btn-text" data-scelta="${k}">${a.testo}</button>`).join('')}</div>`;
     const chiudi = v => { f.onclick = null; f.oncancel = null; if (f.close) f.close(); else f.removeAttribute('open'); risolvi(v); };
     const conferma = k => {
@@ -596,6 +628,7 @@ function mostra() {
   if (sez === 'nuova') { vistaNuova(); pagina = 'nuova'; }
   else if (sez === 'regole') { vistaRegole(); pagina = 'regole'; }
   else if (sez === 'chiedi') { vistaChiedi(); pagina = 'chiedi'; }
+  else if (sez === 'account' && accountAttivo()) vistaAccount();
   else if (sez === 'partita' && trovaPartita(id)) {
     if (sotto === 'manche') { manche = true; vistaManche(id, n === undefined ? null : intero(n)); }
     else vistaPartita(id);
@@ -616,7 +649,7 @@ function vistaPartite() {
   const inCorso = ordina(dati.partite.filter(p => !p.finita));
   const finite = ordina(dati.partite.filter(p => p.finita));
   let html = testata('Burracando', 'Il segnapunti del Burraco', null,
-    `<button class="icon-btn" data-azione="impostazioni" aria-label="Dimensione del testo">${ICO.testo}</button>`);
+    `<button class="icon-btn" data-azione="impostazioni" aria-label="Dimensione del testo">${ICO.testo}</button>${bottoneAccount()}`);
 
   if (!dati.partite.length) {
     html += `<section class="card vuoto">
@@ -719,6 +752,7 @@ function creaPartita() {
   if (nomi.length === 4) squadre = [{ membri: [0, bozza.compagno] }, { membri: [1, 2, 3].filter(i => i !== bozza.compagno) }];
   else squadre = nomi.map((_, i) => ({ membri: [i] }));
   const p = { id: nuovoId(), creata: Date.now(), aggiornata: Date.now(), giocatori: nomi, squadre, regolamento: bozza.regolamento, obiettivo, manche: [], finita: false, vincitore: null };
+  if (utente) p.utente = utente.id;
   dati.partite.push(p);
   salva();
   bozza = null;
@@ -930,6 +964,7 @@ async function apriConta(i, campo) {
 
 function salvaManche() {
   const p = trovaPartita(calc.id);
+  if (!p) { calc = null; avviso('Questa partita è stata eliminata su un altro dispositivo'); vai('#/partite'); return; }
   const chiusi = calc.dettagli.filter(d => !d.manuale && d.chiusura).length;
   if (chiusi > 1) { $('#errore-manche').textContent = 'Può chiudere un solo giocatore o una sola coppia per manche.'; return; }
   const errChiusura = calc.dettagli.map(d => erroreChiusura(d, p.regolamento)).find(Boolean);
@@ -962,6 +997,7 @@ async function annunciaVincitore(p) {
 function rivincita(id) {
   const p = trovaPartita(id);
   const q = { id: nuovoId(), creata: Date.now(), aggiornata: Date.now(), giocatori: p.giocatori.slice(), squadre: JSON.parse(JSON.stringify(p.squadre)), regolamento: p.regolamento, obiettivo: p.obiettivo, manche: [], finita: false, vincitore: null };
+  if (utente) q.utente = utente.id;
   dati.partite.push(q);
   salva();
   vai('#/partita/' + q.id);
@@ -1332,6 +1368,415 @@ async function impostaChiave() {
   vistaChiedi();
 }
 
+/* ---------- Account e storico nel cloud (Supabase) ---------- */
+// Si compilano quando il progetto Supabase è pronto: finché sono vuoti l'app resta solo su questo dispositivo.
+const SUPABASE_URL = '';
+const SUPABASE_CHIAVE = '';     // chiave "publishable": può stare nel codice, i dati li protegge la Row Level Security
+const GOOGLE_ATTIVO = false;    // true quando il login con Google è configurato su Supabase
+const APPLE_ATTIVO = false;     // true quando Sign in with Apple è configurato su Supabase
+const SUPABASE_SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/+esm';
+const RICORDAMI = 'burracando-ricordami';
+const URL_APP = location.href.split('#')[0].split('?')[0];
+
+const LOGO_GOOGLE = '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
+const LOGO_APPLE = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16.37 1.43c0 1.14-.49 2.27-1.18 3.08-.74.9-1.99 1.57-2.99 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.57-2.27 1.21-2.98.8-.94 2.14-1.64 3.25-1.68.03.13.05.28.05.43zm4.56 15.71c-.03.07-.46 1.58-1.52 3.12-.94 1.34-1.94 2.71-3.43 2.71-1.52 0-1.9-.88-3.63-.88-1.7 0-2.3.91-3.67.91-1.38 0-2.33-1.26-3.43-2.8-1.29-1.82-2.32-4.63-2.32-7.28 0-4.28 2.8-6.55 5.55-6.55 1.45 0 2.68.95 3.6.95.87 0 2.22-1.01 3.9-1.01.61 0 2.89.06 4.37 2.19-.13.09-2.38 1.37-2.38 4.19 0 3.26 2.85 4.42 2.96 4.45z"/></svg>';
+
+let supa = null;               // client Supabase
+let utente = null;             // utente connesso, oppure null
+let statoAccount = 'spento';   // spento | caricamento | pronto | errore
+let modoAccesso = 'accedi';    // accedi | registrati | recupera
+let emailAccesso = '';
+let recuperoPassword = false;  // è stato aperto il link di "password dimenticata"
+const sync = { stato: 'fermo', ultimo: null, errore: '' };
+let timerSync = null, syncInCorso = null, syncDaRifare = false;
+
+const accountAttivo = () => !!(SUPABASE_URL && SUPABASE_CHIAVE);
+function vaiA(url) { location.assign(url); }
+
+/* "Ricordami": la sessione sta in localStorage (resta) oppure in sessionStorage (finisce chiudendo l'app) */
+function ricordami() { try { return localStorage.getItem(RICORDAMI) !== 'no'; } catch (e) { return true; } }
+function impostaRicordami(si) {
+  try {
+    localStorage.setItem(RICORDAMI, si ? 'si' : 'no');
+    const da = si ? sessionStorage : localStorage, a = si ? localStorage : sessionStorage;
+    Object.keys(da).filter(k => k.startsWith('sb-')).forEach(k => { a.setItem(k, da.getItem(k)); da.removeItem(k); });
+  } catch (e) { /* memoria non disponibile */ }
+}
+const archivioSessione = {
+  getItem: k => { try { return (ricordami() ? localStorage : sessionStorage).getItem(k); } catch (e) { return null; } },
+  setItem: (k, v) => { try { (ricordami() ? localStorage : sessionStorage).setItem(k, v); } catch (e) { /* memoria non disponibile */ } },
+  removeItem: k => { try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) { /* memoria non disponibile */ } }
+};
+
+function nomeUtente(u) {
+  const m = u.user_metadata || {};
+  return m.full_name || m.name || (u.email || '').split('@')[0] || 'Account';
+}
+
+function bottoneAccount() {
+  if (!accountAttivo()) return '';
+  if (utente) return `<a class="icon-btn" href="#/account" aria-label="Account: ${esc(nomeUtente(utente))}"><span class="avatar av0 piccolo" aria-hidden="true">${esc(iniziale(nomeUtente(utente)))}</span></a>`;
+  return `<a class="icon-btn" href="#/account" aria-label="Accedi o crea un account">${ICO.account}</a>`;
+}
+
+async function avviaAccount() {
+  if (!accountAttivo() || statoAccount === 'caricamento' || statoAccount === 'pronto') return;
+  statoAccount = 'caricamento';
+  const erroreLink = new URLSearchParams(location.hash.replace(/^#/, '')).get('error_description');
+  try {
+    const { createClient } = await import(SUPABASE_SDK);
+    supa = createClient(SUPABASE_URL, SUPABASE_CHIAVE, {
+      auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true, storage: archivioSessione },
+      global: { fetch: (...a) => window.fetch(...a) }
+    });
+    // dentro il callback non si chiamano altre funzioni di Supabase: si rimanda di un giro
+    supa.auth.onAuthStateChange((evento, sessione) => setTimeout(() => cambioSessione(evento, sessione), 0));
+  } catch (e) {
+    statoAccount = 'errore';
+    aggiornaVistaCorrente();
+    return;
+  }
+  if (erroreLink) {
+    history.replaceState(null, '', URL_APP + '#/account');
+    avviso(/expired|invalid/i.test(erroreLink) ? 'Il link è scaduto o è già stato usato: richiedine uno nuovo.' : 'Accesso non riuscito: ' + erroreLink);
+    mostra();
+  }
+}
+
+function cambioSessione(evento, sessione) {
+  const prima = utente, statoPrima = statoAccount;
+  utente = sessione ? sessione.user : null;
+  statoAccount = 'pronto';
+  if (evento === 'PASSWORD_RECOVERY') recuperoPassword = true;
+  if (utente && (!prima || prima.id !== utente.id)) {
+    modoAccesso = 'accedi';
+    // le partite fatte su questo dispositivo senza account passano all'account
+    const nuove = dati.partite.filter(p => !p.utente);
+    nuove.forEach(p => { p.utente = utente.id; });
+    if (nuove.length) scriviLocale();
+    if (evento === 'SIGNED_IN') {
+      avviso(!nuove.length ? 'Accesso effettuato'
+        : nuove.length === 1 ? '1 partita di questo dispositivo è stata aggiunta al tuo account'
+        : `${nuove.length} partite di questo dispositivo sono state aggiunte al tuo account`);
+    }
+    sincronizza();
+  }
+  if (!utente) {
+    recuperoPassword = false;
+    lasciaPartiteAccount();
+  }
+  if (evento === 'PASSWORD_RECOVERY' && !location.hash.startsWith('#/account')) { vai('#/account'); return; }
+  if ((prima && prima.id) !== (utente && utente.id) || statoPrima !== 'pronto' || evento === 'PASSWORD_RECOVERY' || evento === 'USER_UPDATED') aggiornaVistaCorrente();
+}
+
+/* Senza sessione le partite già salvate nel cloud lasciano il dispositivo; quelle mai arrivate restano */
+function lasciaPartiteAccount() {
+  let cambiato = dati.cancellate.length > 0;
+  dati.partite = dati.partite.filter(p => {
+    if (!p.utente) return true;
+    cambiato = true;
+    if (p.sincronizzata === p.aggiornata) return false;
+    delete p.utente;
+    delete p.sincronizzata;
+    return true;
+  });
+  dati.cancellate = [];
+  if (cambiato) scriviLocale();
+}
+
+/* Ridisegna la schermata dopo un cambio arrivato da fuori, senza disturbare chi sta scrivendo */
+function aggiornaVistaCorrente() {
+  const [sez, , sotto] = location.hash.replace(/^#\/?/, '').split('/');
+  if (sotto === 'manche' || sez === 'nuova' || sez === 'chiedi' || $('#dialogo').open) return;
+  const y = window.scrollY;
+  mostra();
+  window.scrollTo(0, y);
+}
+
+/* ---------- Sincronizzazione con la tabella "partite" ---------- */
+// Vince la versione modificata per ultima (campo "aggiornata", in millisecondi).
+function programmaSincronizzazione() {
+  if (!utente) return;
+  clearTimeout(timerSync);
+  timerSync = setTimeout(sincronizza, 1500);
+}
+
+function sincronizza() {
+  if (!supa || !utente) return Promise.resolve();
+  if (syncInCorso) { syncDaRifare = true; return syncInCorso; }
+  clearTimeout(timerSync);
+  impostaStatoSync('in-corso');
+  syncInCorso = eseguiSincronizzazione(utente.id)
+    .then(cambiate => { impostaStatoSync('ok'); if (cambiate) aggiornaVistaCorrente(); })
+    .catch(e => impostaStatoSync(e.offline ? 'offline' : 'errore', e))
+    .finally(() => {
+      syncInCorso = null;
+      if (syncDaRifare) { syncDaRifare = false; sincronizza(); }
+    });
+  return syncInCorso;
+}
+
+async function eseguiSincronizzazione(mio) {
+  const controlla = r => {
+    if (r.error) throw Object.assign(new Error(r.error.message), { offline: !r.status });
+    return r.data;
+  };
+  const remote = controlla(await supa.from('partite').select('id, aggiornata, eliminata, dati'));
+  if (!utente || utente.id !== mio) return false;
+  const remoti = new Map(remote.map(r => [r.id, r]));
+  const daRemota = r => Object.assign({}, r.dati, { aggiornata: r.aggiornata, utente: mio, sincronizzata: r.aggiornata });
+  let cambiate = false;
+
+  // 1. le mie partite su questo dispositivo: si carica la più recente, in un senso o nell'altro
+  const daCaricare = [];
+  for (const p of dati.partite.filter(q => q.utente === mio)) {
+    const r = remoti.get(p.id);
+    if (!r || p.aggiornata > r.aggiornata) daCaricare.push([p, p.aggiornata]);
+    else if (r.aggiornata > p.aggiornata || r.eliminata) {
+      dati.partite = dati.partite.filter(q => q !== p);
+      if (!r.eliminata) dati.partite.push(daRemota(r));
+      cambiate = true;
+    } else p.sincronizzata = p.aggiornata;
+  }
+  // 2. partite eliminate qui: si comunica l'eliminazione, se nessuno le ha modificate dopo
+  const daEliminare = [];
+  dati.cancellate = dati.cancellate.filter(c => {
+    if (c.utente !== mio) return true;
+    const r = remoti.get(c.id);
+    if (r && !r.eliminata && c.aggiornata >= r.aggiornata) { daEliminare.push(c); return true; }
+    return false;
+  });
+  // 3. partite che esistono solo nel cloud (fatte su un altro dispositivo)
+  const presenti = new Set(dati.partite.map(p => p.id));
+  const inEliminazione = new Set(daEliminare.map(c => c.id));
+  for (const r of remote) {
+    if (!r.eliminata && !presenti.has(r.id) && !inEliminazione.has(r.id)) { dati.partite.push(daRemota(r)); cambiate = true; }
+  }
+  // 4. invio al cloud
+  if (daCaricare.length) {
+    controlla(await supa.from('partite').upsert(daCaricare.map(([p]) => rigaPartita(p, mio)), { onConflict: 'user_id,id' }));
+    daCaricare.forEach(([p, versione]) => { p.sincronizzata = versione; });
+  }
+  for (const c of daEliminare) {
+    controlla(await supa.from('partite').update({ eliminata: true, aggiornata: c.aggiornata }).eq('user_id', mio).eq('id', c.id));
+    dati.cancellate = dati.cancellate.filter(x => x !== c);
+  }
+  scriviLocale();
+  return cambiate;
+}
+
+/* Una riga della tabella: colonne leggibili per lo storico, più la partita completa in "dati" */
+function rigaPartita(p, mio) {
+  const { utente: _utente, sincronizzata: _sincronizzata, ...partita } = p;
+  return {
+    user_id: mio,
+    id: p.id,
+    creata_il: new Date(p.creata).toISOString(),
+    aggiornata: p.aggiornata,
+    eliminata: false,
+    regolamento: p.regolamento,
+    obiettivo: p.obiettivo,
+    giocatori: p.giocatori,
+    squadre: p.squadre.map((_, i) => nomeSquadra(p, i)),
+    totali: totali(p),
+    num_manche: p.manche.length,
+    finita: !!p.finita,
+    vincitore: p.finita ? nomeSquadra(p, p.vincitore) : null,
+    dati: partita
+  };
+}
+
+function impostaStatoSync(stato, e) {
+  sync.stato = stato;
+  if (stato === 'ok') sync.ultimo = new Date();
+  sync.errore = e ? e.message : '';
+  const el = $('#stato-sync');
+  if (el) el.textContent = testoStatoSync();
+}
+
+function testoStatoSync() {
+  if (sync.stato === 'in-corso') return 'Salvataggio nel cloud…';
+  if (sync.stato === 'offline') return 'Sei offline: le partite verranno salvate appena torni in rete.';
+  if (sync.stato === 'errore') return 'Salvataggio non riuscito: ' + sync.errore;
+  if (sync.ultimo) return 'Tutto salvato nel cloud alle ' + sync.ultimo.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + '.';
+  return 'Le partite si salvano nel cloud da sole, a ogni modifica.';
+}
+
+/* ---------- Schermata: account ---------- */
+const interruttoreRicordami = () => `<label class="interruttore-riga">
+    <span><strong>Ricordami su questo dispositivo</strong><br><span class="var piccolo">Resti connesso anche quando chiudi l’app. Spegnilo se il telefono non è tuo.</span></span>
+    <input type="checkbox" role="switch" class="switch" data-azione-switch="ricordami" ${ricordami() ? 'checked' : ''}>
+  </label>`;
+
+const campoPassword = (id, etichetta, completamento, descritto) => `<div class="tf con-icona" style="margin-top:20px">
+    <input id="${id}" type="password" autocomplete="${completamento}" aria-describedby="${descritto}">
+    <label for="${id}">${etichetta}</label>
+    <button type="button" class="icon-btn" data-azione="mostra-password" data-campo-id="${id}" aria-label="Mostra la password" aria-pressed="false">${ICO.occhio}</button>
+  </div>`;
+
+function vistaAccount() {
+  let html = testata('Account', utente ? esc(utente.email || '') : 'Salva lo storico nel cloud', '#/partite');
+
+  if (statoAccount !== 'pronto') {
+    html += `<section class="card">
+      <p class="var">${statoAccount === 'errore' ? 'Non riesco a collegarmi al servizio degli account: controlla la connessione.' : 'Collegamento al servizio degli account…'}</p>
+      ${statoAccount === 'errore' ? `<button class="btn btn-tonal" data-azione="account-riprova" style="margin-top:12px">${ICO.ripeti}Riprova</button>` : ''}
+    </section>`;
+  } else if (utente && recuperoPassword) {
+    html += `<section class="card">
+      <h2>Scegli una nuova password</h2>
+      <p class="var">Hai aperto il link per recuperare la password di ${esc(utente.email || 'questo account')}.</p>
+      <form id="form-nuova-password" novalidate>
+        ${campoPassword('nuova-password', 'Nuova password', 'new-password', 'np-aiuto np-msg')}
+        <p class="supporto" id="np-aiuto">Almeno 8 caratteri.</p>
+        <p class="supporto errore" id="np-msg" role="alert"></p>
+        <button class="btn btn-filled btn-largo" type="submit" style="margin-top:8px">Salva la nuova password</button>
+      </form>
+    </section>`;
+  } else if (utente) {
+    const nome = nomeUtente(utente);
+    const provider = (utente.app_metadata && utente.app_metadata.provider) || 'email';
+    const haPassword = (utente.identities || []).some(i => i.provider === 'email');
+    const salvate = dati.partite.filter(p => p.utente === utente.id).length;
+    html += `<section class="card profilo">
+        <span class="avatar grande av0" aria-hidden="true">${esc(iniziale(nome))}</span>
+        <div><h2>${esc(nome)}</h2><p class="var piccolo">${esc(utente.email || '')}</p>
+        <span class="chip pieno">${{ google: 'Accesso con Google', apple: 'Accesso con Apple' }[provider] || 'Accesso con email'}</span></div>
+      </section>
+      <section class="card">
+        <h2>Storico nel cloud</h2>
+        <p>${salvate === 1 ? '1 partita' : `${salvate} partite`} nel tuo account: le ritrovi su ogni dispositivo in cui accedi.</p>
+        <p class="supporto" id="stato-sync" role="status" style="margin:8px 0 12px">${testoStatoSync()}</p>
+        <button class="btn btn-tonal" data-azione="sincronizza">${ICO.ripeti}Sincronizza ora</button>
+      </section>
+      <section class="card">
+        <h2>Accesso e sicurezza</h2>
+        <button class="btn btn-outlined btn-largo" data-azione="cambia-password">${ICO.lucchetto}${haPassword ? 'Cambia password' : 'Imposta una password'}</button>
+        ${interruttoreRicordami()}
+        <button class="btn btn-outlined btn-largo" data-azione="esci" style="margin-top:20px">${ICO.esci}Esci</button>
+      </section>`;
+  } else {
+    const titoli = { accedi: 'Accedi con l’email', registrati: 'Crea un account', recupera: 'Recupera la password' };
+    const social = (GOOGLE_ATTIVO || APPLE_ATTIVO) && modoAccesso !== 'recupera';
+    html += `<section class="card">
+        <p>Con un account lo storico delle partite viene salvato nel cloud e lo ritrovi su ogni dispositivo. Senza account l’app funziona lo stesso, ma solo su questo telefono.</p>
+        ${interruttoreRicordami()}
+      </section>
+      ${social ? `<section class="card">
+        ${GOOGLE_ATTIVO ? `<button class="btn btn-social google btn-largo" data-azione="accedi-google">${LOGO_GOOGLE}Continua con Google</button>` : ''}
+        ${APPLE_ATTIVO ? `<button class="btn btn-social apple btn-largo" data-azione="accedi-apple">${LOGO_APPLE}Continua con Apple</button>` : ''}
+      </section>` : ''}
+      <section class="card">
+        <h2>${titoli[modoAccesso]}</h2>
+        ${modoAccesso === 'recupera' ? '<p class="var">Scrivi l’email del tuo account: ti mandiamo un link per scegliere una nuova password.</p>' : ''}
+        <form id="form-accesso" novalidate>
+          <div class="tf" style="margin-top:20px"><input id="acc-email" type="email" autocomplete="email" inputmode="email" value="${esc(emailAccesso)}" aria-describedby="acc-msg"><label for="acc-email">Email</label></div>
+          ${modoAccesso !== 'recupera' ? campoPassword('acc-password', 'Password', modoAccesso === 'registrati' ? 'new-password' : 'current-password', modoAccesso === 'registrati' ? 'acc-aiuto acc-msg' : 'acc-msg') : ''}
+          ${modoAccesso === 'registrati' ? '<p class="supporto" id="acc-aiuto">Almeno 8 caratteri.</p>' : ''}
+          <p class="supporto errore" id="acc-msg" role="alert"></p>
+          <button class="btn btn-filled btn-largo" type="submit" style="margin-top:8px">${{ accedi: 'Accedi', registrati: 'Crea account', recupera: 'Invia il link' }[modoAccesso]}</button>
+        </form>
+        <div class="link-accesso">${modoAccesso === 'accedi'
+          ? '<button class="btn btn-text" data-azione="modo-accesso" data-val="recupera">Password dimenticata?</button><button class="btn btn-text" data-azione="modo-accesso" data-val="registrati">Crea un account</button>'
+          : '<button class="btn btn-text" data-azione="modo-accesso" data-val="accedi">Ho già un account: accedi</button>'}</div>
+      </section>`;
+  }
+  $('#vista').innerHTML = html;
+  azione('');
+}
+
+function messaggioAuth(e) {
+  const testi = {
+    invalid_credentials: 'Email o password non corrette.',
+    email_not_confirmed: 'Prima devi confermare l’email: apri il link che ti abbiamo mandato.',
+    user_already_exists: 'Esiste già un account con questa email: accedi oppure recupera la password.',
+    email_exists: 'Esiste già un account con questa email: accedi oppure recupera la password.',
+    weak_password: 'Password troppo debole: usa almeno 8 caratteri, meglio con numeri e simboli.',
+    same_password: 'La nuova password deve essere diversa da quella attuale.',
+    over_email_send_rate_limit: 'Sono state inviate troppe email: riprova più tardi.',
+    email_address_not_authorized: 'Per ora non posso mandare email a questo indirizzo: l’invio delle email non è ancora attivo per tutti.',
+    over_request_rate_limit: 'Troppi tentativi: aspetta qualche minuto e riprova.',
+    signup_disabled: 'Le nuove registrazioni sono chiuse.',
+    provider_disabled: 'Questo metodo di accesso non è ancora attivo.',
+    reauthentication_needed: 'Per cambiare la password devi prima confermare la tua identità.'
+  };
+  if (e && testi[e.code]) return testi[e.code];
+  if (e && (e.name === 'AuthRetryableFetchError' || e.status === 0)) return 'Nessuna connessione: controlla internet e riprova.';
+  return 'Qualcosa non ha funzionato' + (e && e.message ? ': ' + e.message : '.');
+}
+
+async function accediConProvider(provider) {
+  if (!supa) return;
+  const { data, error } = await supa.auth.signInWithOAuth({ provider, options: { redirectTo: URL_APP, skipBrowserRedirect: true } });
+  if (error) { avviso(messaggioAuth(error)); return; }
+  vaiA(data.url);
+}
+
+async function inviaAccesso() {
+  const msg = $('#acc-msg');
+  const scrivi = (testo, errore = true) => { msg.textContent = testo; msg.classList.toggle('errore', errore); msg.classList.toggle('ok', !errore); };
+  const email = $('#acc-email').value.trim();
+  emailAccesso = email;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { scrivi('Scrivi un indirizzo email valido.'); $('#acc-email').focus(); return; }
+  const bottone = $('#form-accesso button[type="submit"]');
+  if (modoAccesso === 'recupera') {
+    bottone.disabled = true;
+    const { error } = await supa.auth.resetPasswordForEmail(email, { redirectTo: URL_APP });
+    bottone.disabled = false;
+    scrivi(error ? messaggioAuth(error) : 'Se l’indirizzo è registrato ti arriverà una mail con il link per scegliere una nuova password.', !!error);
+    return;
+  }
+  const password = $('#acc-password').value;
+  if (!password) { scrivi('Scrivi la password.'); $('#acc-password').focus(); return; }
+  if (modoAccesso === 'registrati' && password.length < 8) { scrivi('La password deve avere almeno 8 caratteri.'); $('#acc-password').focus(); return; }
+  bottone.disabled = true;
+  const { data, error } = modoAccesso === 'registrati'
+    ? await supa.auth.signUp({ email, password, options: { emailRedirectTo: URL_APP } })
+    : await supa.auth.signInWithPassword({ email, password });
+  if (!bottone.isConnected) return;   // la schermata è già cambiata: accesso riuscito
+  bottone.disabled = false;
+  if (error) { scrivi(messaggioAuth(error)); return; }
+  if (!data.session) scrivi('Ti abbiamo mandato una mail di conferma: apri il link per attivare l’account.', false);
+}
+
+async function salvaNuovaPassword() {
+  const msg = $('#np-msg');
+  const password = $('#nuova-password').value;
+  if (password.length < 8) { msg.textContent = 'La password deve avere almeno 8 caratteri.'; $('#nuova-password').focus(); return; }
+  const { error } = await supa.auth.updateUser({ password });
+  if (error) { msg.textContent = messaggioAuth(error); return; }
+  recuperoPassword = false;
+  avviso('Password aggiornata');
+  if (location.hash.startsWith('#/account')) vistaAccount();
+}
+
+async function cambiaPassword() {
+  const haPassword = (utente.identities || []).some(i => i.provider === 'email');
+  const v = await dialogo({
+    titolo: haPassword ? 'Cambia password' : 'Imposta una password',
+    testo: haPassword ? 'Scegli una nuova password di almeno 8 caratteri.' : 'Così potrai entrare anche con email e password. Almeno 8 caratteri.',
+    campo: { etichetta: 'Nuova password', valore: '', tipo: 'password', autocomplete: 'new-password', valida: x => x.length >= 8 ? '' : 'Servono almeno 8 caratteri.' },
+    azioni: [{ testo: 'Annulla', valore: null }, { testo: 'Salva', valore: 'ok' }]
+  });
+  if (v === null) return;
+  const { error } = await supa.auth.updateUser({ password: v });
+  avviso(error ? messaggioAuth(error) : 'Password aggiornata');
+}
+
+async function esci() {
+  if (!supa || !utente) return;
+  const mio = utente.id;
+  // prima di uscire si prova a salvare tutto, ma senza aspettare all'infinito
+  await Promise.race([sincronizza(), new Promise(r => setTimeout(r, 5000))]);
+  const nonSalvate = dati.partite.filter(p => p.utente === mio && p.sincronizzata !== p.aggiornata).length;
+  const { error } = await supa.auth.signOut({ scope: 'local' });
+  if (error) { avviso(messaggioAuth(error)); return; }
+  avviso(!nonSalvate ? 'Sei uscito: le tue partite restano al sicuro nel cloud.'
+    : nonSalvate === 1 ? 'Sei uscito. 1 partita non ancora salvata resta su questo telefono.'
+    : `Sei uscito. ${nonSalvate} partite non ancora salvate restano su questo telefono.`);
+  vai('#/partite');
+}
+
 /* ---------- Gestione dei tocchi ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-azione]');
@@ -1385,7 +1830,12 @@ document.addEventListener('click', e => {
     }
     case 'elimina-partita': {
       const id = el.dataset.id;
-      conAnnulla('Partita eliminata', () => { dati.partite = dati.partite.filter(p => p.id !== id); });
+      conAnnulla('Partita eliminata', () => {
+        const p = trovaPartita(id);
+        // se la partita è dell'account, l'eliminazione va comunicata anche al cloud
+        if (p && p.utente) dati.cancellate.push({ id, utente: p.utente, aggiornata: Date.now() });
+        dati.partite = dati.partite.filter(q => q.id !== id);
+      });
       vai('#/partite');
       break;
     }
@@ -1426,10 +1876,35 @@ document.addEventListener('click', e => {
     case 'chat-nuova': if (!chat.inCorso) { chat = { api: [], vista: [], inCorso: false }; vistaChiedi(); } break;
     case 'chat-chiave': impostaChiave(); break;
     case 'chat-suggerimento': chiediAClaude(el.dataset.testo); break;
+
+    case 'accedi-google': accediConProvider('google'); break;
+    case 'accedi-apple': accediConProvider('apple'); break;
+    case 'modo-accesso': {
+      const campo = $('#acc-email');
+      if (campo) emailAccesso = campo.value.trim();
+      modoAccesso = el.dataset.val;
+      vistaAccount();
+      break;
+    }
+    case 'mostra-password': {
+      const campo = document.getElementById(el.dataset.campoId);
+      const visibile = campo.type === 'password';
+      campo.type = visibile ? 'text' : 'password';
+      el.setAttribute('aria-pressed', String(visibile));
+      el.setAttribute('aria-label', visibile ? 'Nascondi la password' : 'Mostra la password');
+      el.innerHTML = visibile ? ICO.occhioNo : ICO.occhio;
+      break;
+    }
+    case 'sincronizza': sincronizza(); break;
+    case 'cambia-password': cambiaPassword(); break;
+    case 'esci': esci(); break;
+    case 'account-riprova': statoAccount = 'spento'; avviaAccount(); vistaAccount(); break;
   }
 });
 
 document.addEventListener('submit', e => {
+  if (e.target.id === 'form-accesso') { e.preventDefault(); inviaAccesso(); return; }
+  if (e.target.id === 'form-nuova-password') { e.preventDefault(); salvaNuovaPassword(); return; }
   if (e.target.id !== 'chat-form') return;
   e.preventDefault();
   const t = $('#chat-testo');
@@ -1464,6 +1939,7 @@ document.addEventListener('input', e => {
 
 document.addEventListener('change', e => {
   const el = e.target;
+  if (el.dataset.azioneSwitch === 'ricordami') { impostaRicordami(el.checked); return; }
   if (!calc || el.type !== 'checkbox') return;
   const i = intero(el.dataset.i);
   const campo = el.dataset.campo;
@@ -1503,6 +1979,9 @@ document.addEventListener('change', e => {
 applicaTesto();
 window.addEventListener('hashchange', mostra);
 mostra();
+avviaAccount();
+window.addEventListener('online', () => sincronizza());
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sincronizza(); });
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

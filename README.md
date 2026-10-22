@@ -8,6 +8,8 @@ Segnapunti per il Burraco, in italiano, pensato per il telefono.
 - **Manche**: calcolatrice guidata (burrachi, punti a terra e in mano, chiusura, pozzetto, conta carte) oppure totale a mano; storico modificabile e totali.
 - **Traguardo**: 2005 di default, scelta rapida 1005/1505/2005/3005 o valore libero, modificabile anche a partita iniziata.
 
+- **Account (facoltativo)**: accesso con email e password (con recupero e cambio password, "Ricordami su questo dispositivo") e con Google; il pulsante Apple è pronto ma spento (`APPLE_ATTIVO`). Con l'account lo storico delle partite si sincronizza con la tabella `partite` di Supabase (struttura in `supabase/migrations/`). Si attiva compilando `SUPABASE_URL` e `SUPABASE_CHIAVE` in `index.html`.
+
 App a file singolo (`index.html`), dati salvati sul dispositivo. È una PWA installabile: se aggiungi o rinomini file, aggiorna `FILE_APP` e `VERSIONE` in `sw.js`.
 
 Link: https://marcopap73.github.io/Burracando/
