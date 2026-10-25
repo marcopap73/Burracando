@@ -1214,6 +1214,11 @@ function vistaManche(id, n) {
         </div>
       </section>`
     : `<section class="card">
+        <div class="voce"><div class="voce-titolo"><strong>Totale complessivo</strong><span>scritto a mano sostituisce il calcolo</span></div>
+        ${colonne((i, d) => `<input class="campo-num num" id="i-totaleDiretto-${i}" data-campo="totaleDiretto" data-i="${i}" inputmode="text" value="${d.manuale ? d.totaleManuale : ''}" placeholder="auto" aria-label="Totale complessivo scritto a mano, ${chi(i)}">`)}
+        </div>
+      </section>
+      <section class="card">
         <h2>Burrachi</h2>
         ${burrachi('puliti', 'Pulito', `+${PUNTI.pulito} · senza matte`)}
         ${R.semipulito ? burrachi('semipuliti', 'Semipulito', `+${PUNTI.semipulito} · matta prima o dopo 7 carte`) : ''}
@@ -1245,6 +1250,7 @@ function vistaManche(id, n) {
 }
 
 function riepilogo(d, regolamento) {
+  if (d.manuale) return 'totale scritto a mano';
   const R = regole(regolamento);
   const parti = [];
   if (d.puliti) parti.push(`${d.puliti}×${PUNTI.pulito}`);
@@ -2257,6 +2263,12 @@ document.addEventListener('input', e => {
     $('#traguardi').innerHTML = htmlTraguardi();
   } else if (campo === 'minuti') {
     bozza.minuti = el.value;
+  } else if (calc && campo === 'totaleDiretto') {
+    // riquadro della calcolatrice: se è compilato vale il totale scritto, se è vuoto torna il calcolo
+    const d = calc.dettagli[intero(el.dataset.i)];
+    d.manuale = el.value.trim() !== '';
+    d.totaleManuale = d.manuale ? intero(el.value) : 0;
+    aggiornaTotaleManche(intero(el.dataset.i));
   } else if (calc && ['terra', 'mano', 'nonGiocato', 'totaleManuale', 'puliti', 'semipuliti', 'sporchi', 'superb', 'reali'].includes(campo)) {
     calc.dettagli[intero(el.dataset.i)][campo] = campo === 'totaleManuale' ? intero(el.value) : Math.max(0, intero(el.value));
     aggiornaTotaleManche(intero(el.dataset.i));
