@@ -3,7 +3,7 @@
    pubblicata) e la copia salvata si usa solo senza connessione; librerie e font, che hanno
    versioni fisse, si prendono dalla copia salvata.
    Se cambi l'elenco dei file, aumenta il numero di VERSIONE. */
-const VERSIONE = 'burracando-v10';
+const VERSIONE = 'burracando-v11';
 const FILE_APP = [
   './',
   './index.html',
