@@ -264,6 +264,8 @@
   .stepper button svg { width: 20px; height: 20px; }
   .stepper button:active { filter: brightness(.92); }
   .stepper output { min-width: 2ch; text-align: center; font-weight: 600; font-size: 1.375rem; }
+  .stepper input { width: 3.2ch; min-width: 44px; height: 44px; padding: 0 2px; border: 1px solid var(--outline); border-radius: 10px; background: transparent; color: var(--on-surface); text-align: center; font-weight: 600; font-size: 1.375rem; flex: none; }
+  .stepper input:focus { outline: none; border: 2px solid var(--primary); }
   .cella { display: flex; flex-direction: column; gap: 4px; align-items: stretch; min-width: 0; }
   .cella .btn-text { min-height: 44px; font-size: .8125rem; padding: 0 4px; gap: 4px; }
   .cella .btn-text svg { width: 18px; height: 18px; }
@@ -1187,7 +1189,7 @@ function vistaManche(id, n) {
       ${colonne((i, d) => N <= 2
         ? `<div class="stepper">
             <button data-azione="meno" data-i="${i}" data-campo="${campo}" aria-label="Togli un ${titolo.toLowerCase()} a ${chi(i)}">${ICO.meno}</button>
-            <output id="o-${campo}-${i}" aria-label="${titolo} di ${chi(i)}">${d[campo]}</output>
+            <input class="num" id="o-${campo}-${i}" data-campo="${campo}" data-i="${i}" inputmode="numeric" value="${d[campo]}" aria-label="${titolo} di ${chi(i)}">
             <button data-azione="piu" data-i="${i}" data-campo="${campo}" aria-label="Aggiungi un ${titolo.toLowerCase()} a ${chi(i)}">${ICO.piu}</button>
           </div>`
         : `<input class="campo-num num" id="i-${campo}-${i}" data-campo="${campo}" data-i="${i}" inputmode="numeric" value="${d[campo] || ''}" placeholder="0" aria-label="${titolo}, ${chi(i)}">`)}
@@ -1282,11 +1284,11 @@ function htmlConta() {
       <div class="testo"><div class="mini-carte">${c.carte.map(([v, cl]) => `<span class="mini-carta ${cl}">${v}</span>`).join('')}</div>${c.nome} · ${c.valore}</div>
       <div class="stepper">
         <button data-azione="conta-meno" data-carta="${c.chiave}" aria-label="Togli un ${c.nome}">${ICO.meno}</button>
-        <output aria-label="Numero di ${c.nome}">${contaTemp[c.chiave] || 0}</output>
+        <input class="num" data-conta-num="${c.chiave}" inputmode="numeric" value="${contaTemp[c.chiave] || 0}" aria-label="Numero di ${c.nome}">
         <button data-azione="conta-piu" data-carta="${c.chiave}" aria-label="Aggiungi un ${c.nome}">${ICO.piu}</button>
       </div>
     </div>`).join('')
-    + `<div class="conta-totale"><button class="btn btn-text" data-azione="conta-azzera">Azzera</button><span>Totale <span class="num" aria-live="polite">${sommaCarte(contaTemp)}</span></span></div>`;
+    + `<div class="conta-totale"><button class="btn btn-text" data-azione="conta-azzera">Azzera</button><span>Totale <span class="num" id="conta-tot" aria-live="polite">${sommaCarte(contaTemp)}</span></span></div>`;
 }
 
 async function apriConta(i, campo) {
@@ -2176,7 +2178,7 @@ document.addEventListener('click', e => {
       const d = calc.dettagli[i];
       const campo = el.dataset.campo;
       d[campo] = Math.max(0, d[campo] + (a === 'piu' ? 1 : -1));
-      $(`#o-${campo}-${i}`).textContent = d[campo];
+      $(`#o-${campo}-${i}`).value = d[campo];
       aggiornaTotaleManche(i);
       break;
     }
@@ -2252,6 +2254,12 @@ document.addEventListener('keydown', e => {
 document.addEventListener('input', e => {
   const el = e.target;
   if (el.id === 'chat-testo') { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 140) + 'px'; return; }
+  // numero di carte scritto a mano nel dialogo "Conta le carte"
+  if (el.dataset.contaNum) {
+    contaTemp[el.dataset.contaNum] = Math.max(0, intero(el.value));
+    $('#conta-tot').textContent = sommaCarte(contaTemp);
+    return;
+  }
   const campo = el.dataset.campo;
   if (!campo) return;
   if (campo === 'nome') {
@@ -2273,6 +2281,11 @@ document.addEventListener('input', e => {
     calc.dettagli[intero(el.dataset.i)][campo] = campo === 'totaleManuale' ? intero(el.value) : Math.max(0, intero(el.value));
     aggiornaTotaleManche(intero(el.dataset.i));
   }
+});
+
+// nei contatori + e − il numero si seleziona al tocco, così si scrive direttamente sopra
+document.addEventListener('focusin', e => {
+  if (e.target.matches('.stepper input')) e.target.select();
 });
 
 document.addEventListener('change', e => {

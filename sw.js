@@ -1,9 +1,9 @@
-/* Service worker di Burracando: fa funzionare l'app anche senza internet.
-   Strategia: i file dell'app arrivano sempre dalla rete (così si vede subito l'ultima versione
+﻿/* Service worker di Burracando: fa funzionare l'app anche senza internet.
+   Strategia: i file dell'app arrivano sempre dalla rete (cosÃ¬ si vede subito l'ultima versione
    pubblicata) e la copia salvata si usa solo senza connessione; librerie e font, che hanno
    versioni fisse, si prendono dalla copia salvata.
    Se cambi l'elenco dei file, aumenta il numero di VERSIONE. */
-const VERSIONE = 'burracando-v11';
+const VERSIONE = 'burracando-v12';
 const FILE_APP = [
   './',
   './index.html',
@@ -42,7 +42,7 @@ self.addEventListener('fetch', e => {
     return risposta;
   };
   if (url.origin === self.location.origin) {
-    // "no-cache" chiede sempre al server se il file è cambiato, anche se il browser ne ha una copia recente
+    // "no-cache" chiede sempre al server se il file Ã¨ cambiato, anche se il browser ne ha una copia recente
     e.respondWith(
       fetch(url.href, { cache: 'no-cache', credentials: 'same-origin' })
         .then(salva)
